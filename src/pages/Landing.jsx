@@ -585,6 +585,12 @@ function Features() {
 }
 
 // ── Monetização / Planos ──────────────────────────────────────────
+async function handleCheckout(plan) {
+  const res = await fetch('/api/create-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }) });
+  const data = await res.json();
+  if (data.url) window.location.href = data.url;
+}
+
 function Pricing() {
   const [billingTab, setBillingTab] = useState("mensal");
 
@@ -729,6 +735,7 @@ function Pricing() {
               <button
                 className={plan.highlight ? "btn-primary" : "btn-outline"}
                 style={{ width: "100%" }}
+              onClick={() => plan.name === "Místico" ? handleCheckout("mistico") : plan.name === "Sagrado" ? handleCheckout("sagrado") : null}
               >
                 {plan.cta}
               </button>
