@@ -770,7 +770,7 @@ function WaitlistForm() {
   const [count] = useState(2487);
 
   const handleSubmit = async () => {
-    if (form.email && form.birth) { const { error } = await supabase.from('waitlist').insert({ email: form.email, birth_date: form.birth, name: form.name }); if (!error) setSubmitted(true); }
+    if (form.email && form.birth) { const { error } = await supabase.from('waitlist').insert({ email: form.email, birth_date: form.birth, name: form.name }); if (!error) { setSubmitted(true); await fetch('/api/send-welcome-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email, name: form.name }) }); } }
   };
 
   return (
