@@ -1,3 +1,6 @@
+import { createClient } from '@supabase/supabase-js';
+const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
+
 import { useState, useEffect, useRef } from "react";
 
 const COLORS = {
@@ -766,8 +769,8 @@ function WaitlistForm() {
   const [submitted, setSubmitted] = useState(false);
   const [count] = useState(2487);
 
-  const handleSubmit = () => {
-    if (form.email && form.birth) setSubmitted(true);
+  const handleSubmit = async () => {
+    if (form.email && form.birth) { const { error } = await supabase.from('waitlist').insert({ email: form.email, birth_date: form.birth, name: form.name }); if (!error) setSubmitted(true); }
   };
 
   return (
