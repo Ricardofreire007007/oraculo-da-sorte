@@ -15,10 +15,10 @@ import { useState } from "react";
 // ══════════════════════════════════════
 //  CONFIGURAÇÃO — Atualize com seus Price IDs do Stripe
 // ══════════════════════════════════════
-const STRIPE_PRICES = {
-  mistico: "price_1TBgLtQVr1vWNlVfuC5QoToc",   // R$9,99/semana
-  sagrado: "price_1TBgMwQVr1vWNlVfUJG9Zlb",   // R$29,99/mês
-  consulta: "price_1TBgJtQVr1vWNlVfroE2vf4z",  // R$1,99 avulso
+const PLAN_IDS = {
+  mistico: "mistico",
+  sagrado: "sagrado",
+  consulta: "consulta",
 };
 
 // ══════════════════════════════════════
@@ -59,7 +59,7 @@ const plans = [
     ],
     cta: "Ativar Poderes",
     popular: true,
-    stripe: STRIPE_PRICES.mistico,
+    stripe: "mistico",
   },
   {
     id: "sagrado",
@@ -78,7 +78,7 @@ const plans = [
     ],
     cta: "Ascender Agora",
     popular: false,
-    stripe: STRIPE_PRICES.sagrado,
+    stripe: "sagrado",
   },
 ];
 
@@ -486,14 +486,14 @@ export default function Pricing() {
   const [loading, setLoading] = useState(false);
 
   // ── Stripe Checkout ──
-  const handleCheckout = async (priceId) => {
-    if (!priceId) return; // Plano Livre → não faz checkout
+ const handleCheckout = async (plan) => {
+    if (!plan) return; // Plano Livre → não faz checkout
     setLoading(true);
     try {
       const res = await fetch("/api/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ plan }),
       });
       const data = await res.json();
       if (data.url) {
@@ -640,7 +640,7 @@ export default function Pricing() {
           </div>
           <br />
           <button
-            onClick={() => handleCheckout(STRIPE_PRICES.consulta)}
+            onClick={() => handleCheckout("consulta")}
             onMouseEnter={() => setPpuBtnHover(true)}
             onMouseLeave={() => setPpuBtnHover(false)}
             style={s.ppuBtn(ppuBtnHover)}
