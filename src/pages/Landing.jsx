@@ -407,11 +407,11 @@ function Navbar({ activeSection, setActiveSection }) {
         ✦ Oráculo da Sorte
       </div>
       <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-        {["Início", "Como Funciona", "Planos", "FAQ"].map((item) => (
+        {["Início", "como-funciona", "planos", "faq"].map((item) => (
           <span
             key={item}
             className="nav-link"
-            onClick={() => setActiveSection(item)}
+            onClick={() => { setActiveSection(item); document.getElementById(item)?.scrollIntoView({ behavior: 'smooth' }); }}
             style={{ color: activeSection === item ? COLORS.gold : undefined }}
           >
             {item}
@@ -504,7 +504,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section style={{ padding: "100px 32px", position: "relative", zIndex: 1 }}>
+    <section id="como-funciona" style={{ padding: "100px 32px", position: "relative", zIndex: 1 }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <p className="cinzel" style={{ textAlign: "center", color: COLORS.gold, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 12 }}>
           O RITUAL
@@ -764,6 +764,11 @@ function Pricing() {
           <span style={{ color: COLORS.textMuted, fontSize: 15, marginLeft: 12 }}>
             Consultas avulsas por <strong style={{ color: COLORS.text }}>R$1,99</strong> cada — sem assinatura. Ideal para experimentar.
           </span>
+          <div style={{ marginTop: 12 }}>
+            <a href="/pricing" className="nav-link" style={{ color: COLORS.gold, fontSize: 14 }}>
+              Ver detalhes completos dos planos →
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -926,7 +931,7 @@ function FAQ() {
   ];
 
   return (
-    <section style={{ padding: "80px 32px", position: "relative", zIndex: 1 }}>
+    <section id="faq" style={{ padding: "80px 32px", position: "relative", zIndex: 1 }}>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
         <h2 className="section-title" style={{ color: COLORS.text, marginBottom: 8 }}>
           Perguntas <span className="gradient-text">Frequentes</span>
