@@ -1078,111 +1078,6 @@ function Footer() {
 }
 
 // ── Content Strategy Panel ────────────────────────────────────────
-function ContentStrategy() {
-  const [tab, setTab] = useState("X");
-  const posts = {
-    X: [
-      {
-        timing: "Quinta, 17h00 (antes do sorteio)",
-        text: `Mega-Sena hoje ✨\n\nSeu número do dia para [signo] → gerado pelo Oráculo.\n\nJogue com intenção, não com sorte cega.\n\n🔮 oraculo-da-sorte.vercel.app\n\n#MegaSena #Numerologia #SorteBrasileira`,
-      },
-      {
-        timing: "Sábado, 17h30 (antes da Quina)",
-        text: `Quina hoje 🌙\n\n[Fase da lua] aumenta a frequência de [X número] nos últimos 12 sorteios.\n\nCuriосidade ou coincidência? O Oráculo tem a resposta.\n\n👇 Gere o seu: oraculo-da-sorte.vercel.app\n\n#Quina #CiclosLunares #Loteria`,
-      },
-    ],
-    Instagram: [
-      {
-        timing: "Carrossel — qualquer dia",
-        text: `Slide 1: "Você sabe qual é o seu número de vida?"\nSlide 2: "Numerologia + Data de nascimento = seu número pessoal"\nSlide 3: [Exemplo visual: 15/03/1990 → Nº 1]\nSlide 4: "Combine com padrões históricos da Mega-Sena"\nSlide 5: "Jogue com intenção. Crie seu ritual no Oráculo 👇"\nCTA: Link na bio → waitlist`,
-      },
-      {
-        timing: "Stories — dias de sorteio",
-        text: `Poll: "Você já jogou hoje? 🎱"\nSim / Ainda não\n\n→ Quem respondeu 'Não': redirecionar para o app\n→ Quem respondeu 'Sim': pergunta de engajamento sobre número escolhido`,
-      },
-    ],
-    TikTok: [
-      {
-        timing: "Reel 30s — viral",
-        text: `Hook (0–3s): "Esse número saiu 47x na Mega-Sena desde 1996"\nDesenvolvimento (3–20s): mostrar análise histórica real no app\nReveal (20–25s): gerar números pelo app com data de nascimento\nCTA (25–30s): "Gere o seu na bio 🔮 #Numerologia #MegaSena #LoteriaBR"`,
-      },
-    ],
-  };
-
-  return (
-    <section style={{ padding: "80px 32px", position: "relative", zIndex: 1 }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <p className="cinzel" style={{ textAlign: "center", color: COLORS.gold, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 12 }}>
-          ESTRATÉGIA DE CONTEÚDO
-        </p>
-        <h2 className="section-title" style={{ color: COLORS.text, marginBottom: 8 }}>
-          Posts prontos para <span className="gradient-text">usar agora</span>
-        </h2>
-        <p style={{ textAlign: "center", color: COLORS.textMuted, fontStyle: "italic", marginBottom: 40 }}>
-          Copie, adapte e publique — otimizados para engajamento antes dos sorteios
-        </p>
-
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 32 }}>
-          {["X", "Instagram", "TikTok"].map(t => (
-            <button key={t} className={`tab-btn ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
-              {t}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {posts[tab].map((p, i) => (
-            <div key={i} className="card-mystical" style={{ padding: 28 }}>
-              <div style={{
-                display: "inline-block", marginBottom: 14,
-                background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)",
-                borderRadius: 6, padding: "4px 12px",
-              }}>
-                <span className="cinzel" style={{ fontSize: 11, color: COLORS.gold, letterSpacing: "0.1em" }}>
-                  ⏰ {p.timing}
-                </span>
-              </div>
-              <pre style={{
-                fontFamily: "'EB Garamond', Georgia, serif",
-                fontSize: 15, color: COLORS.text, lineHeight: 1.8,
-                whiteSpace: "pre-wrap", wordBreak: "break-word",
-              }}>
-                {p.text}
-              </pre>
-            </div>
-          ))}
-        </div>
-
-        {/* Calendar suggestion */}
-        <div style={{
-          marginTop: 32, padding: "24px 28px",
-          background: "rgba(61,140,110,0.08)",
-          border: "1px solid rgba(61,140,110,0.2)",
-          borderRadius: 12,
-        }}>
-          <p className="cinzel" style={{ color: COLORS.green, fontSize: 13, marginBottom: 10 }}>
-            📅 Calendário de Postagens Recomendado
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-            {[
-              ["Terça-feira", "Conteúdo educativo (numerologia)"],
-              ["Quinta, 17h", "Post antes da Mega-Sena"],
-              ["Sábado, 17h", "Post antes da Quina/Lotofácil"],
-              ["Domingo", "Resultado + engajamento"],
-            ].map(([day, desc]) => (
-              <div key={day} style={{ fontSize: 14 }}>
-                <div className="cinzel" style={{ color: COLORS.text, fontSize: 13 }}>{day}</div>
-                <div style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 2 }}>{desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── App ───────────────────────────────────────────────────────────
 export default function App() {
   const [communityWins] = useState(247);
   const [communityTotal] = useState(184930);
@@ -1207,7 +1102,7 @@ export default function App() {
         <Pricing />
         <Testimonials />
         <div ref={waitlistRef}><WaitlistForm /></div>
-        <ContentStrategy />
+
         <FAQ />
         <LegalDisclaimer />
       </main>
