@@ -70,6 +70,22 @@ const styles = `
   .animate-spin-slow { animation: spin-slow 20s linear infinite; }
   .animate-fadeInUp { animation: fadeInUp 0.8s ease forwards; }
   .animate-pulse-gold { animation: pulse-gold 2s ease-in-out infinite; }
+  @keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes glow-breathe {
+  0%, 100% { box-shadow: 0 0 30px rgba(180,155,100,0.2), 0 0 60px rgba(180,155,100,0.06); }
+  50% { box-shadow: 0 0 55px rgba(180,155,100,0.45), 0 0 100px rgba(180,155,100,0.18); }
+}
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.5; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
 
   .star {
     position: absolute;
@@ -284,6 +300,56 @@ const styles = `
 `;
 
 // ── Stars background ──────────────────────────────────────────────
+function WinnersBanner({ wins, totalBRL }) {
+  return (
+    <div style={{
+      position: "fixed", top: "80px", right: "20px", zIndex: 100,
+      background: "linear-gradient(135deg, rgba(12,10,28,0.97), rgba(18,14,38,0.97))",
+      border: "1px solid rgba(180,155,100,0.5)",
+      borderRadius: "12px", padding: "22px 26px", width: "300px", overflow: "hidden",
+      animation: "glow-breathe 4s ease-in-out infinite",
+    }}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:"2px",
+        background:"linear-gradient(90deg,transparent,rgba(180,155,100,0.9),rgba(255,220,120,1),rgba(180,155,100,0.9),transparent)",
+        backgroundSize:"200% auto",animation:"shimmer 2.5s linear infinite"}}/>
+      <div style={{position:"absolute",top:0,left:0,width:28,height:28,borderTop:"1px solid rgba(180,155,100,0.7)",borderLeft:"1px solid rgba(180,155,100,0.7)",borderRadius:"12px 0 0 0",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",bottom:0,right:0,width:28,height:28,borderBottom:"1px solid rgba(180,155,100,0.7)",borderRight:"1px solid rgba(180,155,100,0.7)",borderRadius:"0 0 12px 0",pointerEvents:"none"}}/>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"16px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
+          <div style={{width:"9px",height:"9px",borderRadius:"50%",background:"#4ade80",
+            animation:"pulse-ring 2s ease-in-out infinite",boxShadow:"0 0 8px #4ade8066"}}/>
+          <span style={{fontSize:"9px",letterSpacing:"3px",textTransform:"uppercase",
+            color:"rgba(180,155,100,0.7)",fontFamily:"'DM Sans',sans-serif"}}>Comunidade Oráculo</span>
+        </div>
+        <span style={{fontSize:"18px",animation:"float 3s ease-in-out infinite"}}>🔮</span>
+      </div>
+      <div style={{height:"1px",background:"linear-gradient(90deg,transparent,rgba(180,155,100,0.3),transparent)",marginBottom:"18px"}}/>
+      <div style={{display:"flex",alignItems:"stretch"}}>
+        <div style={{flex:1,paddingRight:"16px"}}>
+          <div style={{fontSize:"10px",color:"rgba(240,237,232,0.35)",letterSpacing:"1px",
+            textTransform:"uppercase",marginBottom:"6px",fontFamily:"'DM Sans',sans-serif"}}>Apostas vencedoras</div>
+          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"40px",fontWeight:300,lineHeight:1,
+            background:"linear-gradient(135deg,#f0ede8,rgba(180,155,100,0.9),#f0ede8)",
+            backgroundSize:"200% auto",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
+            animation:"shimmer 3s linear infinite"
+          }}>{wins.toLocaleString("pt-BR")}</div>
+          <div style={{fontSize:"9px",color:"rgba(180,155,100,0.45)",marginTop:"4px",
+            fontFamily:"'DM Sans',sans-serif"}}>jogadores premiados</div>
+        </div>
+        <div style={{width:"1px",background:"linear-gradient(180deg,transparent,rgba(180,155,100,0.3),transparent)",flexShrink:0}}/>
+        <div style={{flex:1,paddingLeft:"16px"}}>
+          <div style={{fontSize:"10px",color:"rgba(240,237,232,0.35)",letterSpacing:"1px",
+            textTransform:"uppercase",marginBottom:"6px",fontFamily:"'DM Sans',sans-serif"}}>Total ganho</div>
+          <div style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"22px",fontWeight:300,lineHeight:1.2,
+            color:"rgba(180,155,100,0.95)",textShadow:"0 0 20px rgba(180,155,100,0.4)"
+          }}>R$<br/><span style={{fontSize:"28px"}}>{totalBRL.toLocaleString("pt-BR",{maximumFractionDigits:0})}</span></div>
+          <div style={{fontSize:"9px",color:"rgba(180,155,100,0.45)",marginTop:"4px",
+            fontFamily:"'DM Sans',sans-serif"}}>em prémios reais</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function Stars() {
   const stars = Array.from({ length: 80 }, (_, i) => ({
     id: i,
@@ -781,6 +847,7 @@ function WaitlistForm() {
   const [submitted, setSubmitted] = useState(false);
   const [count] = useState(2487);
 
+
   const handleSubmit = async () => {
     if (form.email && form.birth) { const { error } = await supabase.from('waitlist').insert({ email: form.email, birth_date: form.birth, name: form.name }); if (!error) { setSubmitted(true); await fetch('/api/send-welcome-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email, name: form.name }) }); } }
   };
@@ -1117,6 +1184,8 @@ function ContentStrategy() {
 
 // ── App ───────────────────────────────────────────────────────────
 export default function App() {
+  const [communityWins] = useState(247);
+  const [communityTotal] = useState(184930);
   const [activeSection, setActiveSection] = useState("Início");
   const waitlistRef = useRef(null);
 
@@ -1128,6 +1197,7 @@ export default function App() {
     <>
       <style>{styles}</style>
       <Stars />
+      <WinnersBanner wins={communityWins} totalBRL={communityTotal} />
       <Navbar activeSection={activeSection} setActiveSection={setActiveSection} />
 
       <main style={{ position: "relative", zIndex: 1 }}>
