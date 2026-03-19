@@ -683,7 +683,7 @@ function Pricing() {
       name: "Místico",
       icon: "🔮",
       price: { mensal: "R$9,90", anual: "R$7,90" },
-      period: billingTab === "anual" ? "/semana � cobrado anualmente" : "/semana",
+      period: billingTab === "anual" ? "/semana � cobrado anualmente" : "/semana",
       color: COLORS.gold,
       badge: "Mais Popular",
       features: [
@@ -702,7 +702,7 @@ function Pricing() {
       name: "Sagrado",
       icon: "👑",
       price: { mensal: "R$24,90", anual: "R$19,90" },
-      period: billingTab === "anual" ? "/semana � cobrado anualmente" : "/semana",
+      period: billingTab === "anual" ? "/semana � cobrado anualmente" : "/semana",
       color: COLORS.amber,
       features: [
         "✓ Tudo do plano Místico",
