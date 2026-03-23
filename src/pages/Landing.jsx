@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
-
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../AuthContext.jsx";
+import OnboardingPopup from "../OnboardingPopup.jsx";
 
 const COLORS = {
   bg: "#0a0612",
@@ -451,7 +455,7 @@ function MysticalOrb() {
 }
 
 // ── Navbar ────────────────────────────────────────────────────────
-function Navbar({ activeSection, setActiveSection }) {
+function Navbar({ activeSection, setActiveSection, user, login, logout }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40);
@@ -483,9 +487,15 @@ function Navbar({ activeSection, setActiveSection }) {
             {item}
           </span>
         ))}
-        <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }}>
-          Entrar na Waitlist
-        </button>
+{user ? (
+          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={logout}>
+            Sair
+          </button>
+        ) : (
+          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={login}>
+            Entrar com Google
+          </button>
+        )}
       </div>
     </nav>
   );
@@ -825,10 +835,10 @@ function Pricing() {
           textAlign: "center",
         }}>
           <span className="cinzel" style={{ color: COLORS.gold, fontSize: 14, letterSpacing: "0.05em" }}>
-            💡 Prefere pagar por uso?
+            💡 Prefere não assinar?
           </span>
           <span style={{ color: COLORS.textMuted, fontSize: 15, marginLeft: 12 }}>
-            Consultas avulsas por <strong style={{ color: COLORS.text }}>R$1,99</strong> cada — sem assinatura. Ideal para experimentar.
+            Pacote de 3 consultas por <strong style={{ color: COLORS.text }}>R$6,00</strong> (R$2,00 cada) — sem assinatura. Ideal para experimentar.
           </span>
           <div style={{ marginTop: 12 }}>
             <a href="/pricing" className="nav-link" style={{ color: COLORS.gold, fontSize: 14 }}>
@@ -1083,6 +1093,7 @@ export default function App() {
   const [communityTotal] = useState(184930);
   const [activeSection, setActiveSection] = useState("Início");
   const waitlistRef = useRef(null);
+  const { user, profile, loading, showOnboarding, login, logout, completeOnboarding } = useAuth();
 
   const scrollToWaitlist = () => {
     waitlistRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -1090,10 +1101,13 @@ export default function App() {
 
   return (
     <>
-      <style>{styles}</style>
+     <style>{styles}</style>
+      {showOnboarding && user && (
+        <OnboardingPopup userId={user.id} onComplete={completeOnboarding} />
+      )}
       <Stars />
       <WinnersBanner wins={communityWins} totalBRL={communityTotal} />
-      <Navbar activeSection={activeSection} setActiveSection={setActiveSection} />
+      <Navbar activeSection={activeSection} setActiveSection={setActiveSection} user={user} login={login} logout={logout} />
 
       <main style={{ position: "relative", zIndex: 1 }}>
         <Hero onJoinWaitlist={scrollToWaitlist} />

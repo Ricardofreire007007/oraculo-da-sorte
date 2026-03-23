@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { purchasePackage } from "../revenuecat.js";
 
 /*
  * ─────────────────────────────────────────────
  *  ORÁCULO DA SORTE — Pricing Component
  * ─────────────────────────────────────────────
  *  3 planos: Livre · Místico · Sagrado
- *  + Pay-per-use (R$1,99/consulta)
+ *  assinatura+ Pay-per-use (3 consultas por R$6,00)
  *
  *  Integração Stripe via /api/create-checkout
  *  Substituir os PRICE IDs pelos seus do Stripe
@@ -487,25 +488,23 @@ export default function Pricing() {
 
   // ── Stripe Checkout ──
  const handleCheckout = async (plan) => {
-    if (!plan) return; // Plano Livre → não faz checkout
+    if (!plan) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/create-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        console.error("Erro ao criar sessão:", data);
-        setLoading(false);
+      const packageMap = {
+        mistico: '$rc_weekly',
+        sagrado: '$rc_monthly',
+        consulta: 'custom',
+      };
+      const packageId = packageMap[plan];
+      const result = await purchasePackage(packageId);
+      if (result) {
+        window.location.href = '/app';
       }
     } catch (err) {
-      console.error("Erro no checkout:", err);
-      setLoading(false);
+      console.error('Erro no checkout:', err);
     }
+    setLoading(false);
   };
 
   const handleFree = () => {
@@ -629,14 +628,14 @@ export default function Pricing() {
           onMouseEnter={() => setHoveredPpu(true)}
           onMouseLeave={() => setHoveredPpu(false)}
         >
-          <h3 style={s.ppuTitle}>Consulta Avulsa</h3>
+          <h3 style={s.ppuTitle}>Pacote 3 Consultas</h3>
           <p style={s.ppuDesc}>
-            Sem compromisso? Faça uma consulta única ao Oráculo
-            com análise mística completa, sem precisar de assinatura.
+            Faça 3 consultas ao Oráculo
+            com análise mística completa, sem precisar de assinatura. Apenas R$2,00 por consulta!
           </p>
           <div style={s.ppuPrice}>
-            <span style={s.ppuValue}>R$ 1,99</span>
-            <span style={s.ppuPer}>/consulta</span>
+            <span style={s.ppuValue}>R$ 6,00</span>
+            <span style={s.ppuPer}>/3 consultas</span>
           </div>
           <br />
           <button
@@ -645,7 +644,7 @@ export default function Pricing() {
             onMouseLeave={() => setPpuBtnHover(false)}
             style={s.ppuBtn(ppuBtnHover)}
           >
-            Consultar o Oráculo
+            Comprar Pacote de 3 Consultas
           </button>
         </div>
       </div>
