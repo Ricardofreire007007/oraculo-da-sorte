@@ -98,12 +98,36 @@ function ResultCard({ result }) {
           fase de <em>{result.moon.influence}</em>, o Oráculo combinou a vibração do seu
           Número de Vida <strong style={{ color: COLORS.gold }}>({result.lifeNumber})</strong> com
           a ressonância do dia <strong style={{ color: COLORS.gold }}>({result.dayVibration})</strong>.
-          Os números revelados estão alinhados com a sua energia cósmica pessoal.        </p>
+          Os números revelados respeitam o equilíbrio cósmico:
+          {' '}{result.pressupostos.pares} pares e {result.pressupostos.impares} ímpares,
+          {' '}{result.pressupostos.baixos} baixos e {result.pressupostos.altos} altos,
+          com soma total de <strong style={{ color: COLORS.gold }}>{result.pressupostos.soma}</strong>.
+        </p>
         <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 12, fontStyle: 'italic' }}>
           Jogue com intenção, não com sorte cega. Este é um momento de conexão espiritual.
         </p>
       </div>
 
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{
+          background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)',
+          borderRadius: 8, padding: '8px 16px', fontSize: 13, color: COLORS.textMuted,
+        }}>
+          &#9878;&#65039; {result.pressupostos.pares}P / {result.pressupostos.impares}I
+        </div>
+        <div style={{
+          background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)',
+          borderRadius: 8, padding: '8px 16px', fontSize: 13, color: COLORS.textMuted,
+        }}>
+          &#128202; {result.pressupostos.baixos}B / {result.pressupostos.altos}A
+        </div>
+        <div style={{
+          background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)',
+          borderRadius: 8, padding: '8px 16px', fontSize: 13, color: COLORS.textMuted,
+        }}>
+          &#128290; Soma: {result.pressupostos.soma}
+        </div>
+      </div>
     </div>
   );
 }
