@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { purchasePackage } from "../revenuecat.js";
+import { useAuth } from "../AuthContext.jsx";
 
 /*
  * ─────────────────────────────────────────────
@@ -480,6 +481,7 @@ const s = {
 //  COMPONENTE PRINCIPAL
 // ══════════════════════════════════════
 export default function Pricing() {
+ const { user, login } = useAuth();
   const [hoveredCard, setHoveredCard] = useState(null);
   const [hoveredPpu, setHoveredPpu] = useState(false);
   const [btnHover, setBtnHover] = useState(null);
@@ -508,8 +510,11 @@ export default function Pricing() {
   };
 
   const handleFree = () => {
-    // Redireciona para o app ou para o cadastro
-    window.location.href = "/app";
+    if (!user) {
+      login();
+    } else {
+      window.location.href = "/app";
+    }
   };
 
   return (
