@@ -552,7 +552,7 @@ function Hero({ onJoinWaitlist }) {
           </div>
 
           <div style={{ display: "flex", gap: 32, marginTop: 40 }}>
-            {[["2.400+", "na waitlist"], ["4.8★", "avaliação beta"], ["R$1", "primeira consulta"]].map(([num, label]) => (
+            {[["4.8★", "avaliação beta"], ["100%", "místico"], ["R$9,99", "plano semanal"]].map(([num, label]) => (
               <div key={label}>
                 <div className="cinzel gradient-text" style={{ fontSize: 22, fontWeight: 700 }}>{num}</div>
                 <div style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 2 }}>{label}</div>
