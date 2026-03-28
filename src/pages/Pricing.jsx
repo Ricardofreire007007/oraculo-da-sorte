@@ -502,7 +502,7 @@ export default function Pricing() {
         if (data.url) { window.location.href = data.url; return; }
         const result = { customerInfo: null };
         window.location.href = '/app';
-      }
+
     } catch (err) {
       console.error('Erro no checkout:', err);
     }
