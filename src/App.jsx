@@ -1,4 +1,4 @@
-// src/App.jsx — Página de Consulta do Oráculo
+﻿// src/App.jsx — Página de Consulta do Oráculo
 import { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { generateMysticNumbers, getMoonPhase, calcLifeNumber } from './oracle.js';
@@ -117,6 +117,7 @@ export default function App() {
 
   useEffect(function() {
     if (user) {
+      if (profile && profile.plano === 'paid') return;
       var key = 'oracle_consulted_' + user.id;
       var lastConsult = localStorage.getItem(key);
       var today = new Date().toDateString();
@@ -138,9 +139,11 @@ export default function App() {
       setConsulted(true);
       setAnimating(false);
 
-      var key = 'oracle_consulted_' + user.id;
-      localStorage.setItem(key, new Date().toDateString());
-      localStorage.setItem(key + '_result', JSON.stringify(oracleResult));
+      if (!profile || profile.plano !== 'paid') {
+        var key = 'oracle_consulted_' + user.id;
+        localStorage.setItem(key, new Date().toDateString());
+        localStorage.setItem(key + '_result', JSON.stringify(oracleResult));
+      }
     }, 2500);
   };
 
