@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+﻿import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -511,15 +511,15 @@ function Hero({ onJoinWaitlist }) {
       <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
         {/* Left */}
         <div className="animate-fadeInUp">
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)",
-            borderRadius: 20, padding: "6px 16px", marginBottom: 28,
-          }}>
-            <span style={{ color: COLORS.gold, fontSize: 13 }}>✦</span>
-            <span className="cinzel" style={{ fontSize: 12, letterSpacing: "0.15em", color: COLORS.gold, textTransform: "uppercase" }}>
-              Waitlist Aberta
-            </span>
+
+
+
+
+
+
+
+
+
           </div>
 
           <h1 className="cinzel-deco" style={{
@@ -543,8 +543,8 @@ function Hero({ onJoinWaitlist }) {
           </p>
 
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-            <button className="btn-primary animate-pulse-gold" onClick={onJoinWaitlist}>
-              ✦ Entrar na Waitlist Grátis
+            <button className="btn-primary animate-pulse-gold" onClick={() => window.location.href="/pricing"}>
+              ✦ Começar Agora
             </button>
             <button className="btn-outline">
               Ver Como Funciona
@@ -704,7 +704,7 @@ function Pricing() {
         "✓ Ritual dos Orixás completo",
         "✓ Histórico e estatísticas pessoais",
         "✗ Bolão espiritual",
-      ],
+      cta: "Assinar Místico",
       cta: "Entrar na Waitlist Premium",
       highlight: true,
     },
@@ -722,7 +722,7 @@ function Pricing() {
         "✓ Acesso antecipado a novidades",
         "✓ Badge exclusivo de fundador",
         "✓ Suporte prioritário",
-      ],
+      cta: "Assinar Sagrado",
       cta: "Entrar na Waitlist Sagrado",
       highlight: false,
     },
@@ -1115,7 +1115,7 @@ export default function App() {
         <Features />
         <Pricing />
         <Testimonials />
-        <div ref={waitlistRef}><WaitlistForm /></div>
+
 
         <FAQ />
         <LegalDisclaimer />

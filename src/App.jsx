@@ -224,7 +224,7 @@ export default function App() {
             background: 'rgba(61,140,110,0.15)', border: '1px solid rgba(61,140,110,0.3)',
             borderRadius: 20, padding: '4px 12px', fontSize: 12, color: COLORS.green,
           }}>
-            Plano Livre
+            {profile && profile.plano === 'paid' ? 'Plano Místico' : 'Plano Livre'}
           </span>
         </div>
       </div>
