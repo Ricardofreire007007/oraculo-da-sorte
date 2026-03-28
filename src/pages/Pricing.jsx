@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { purchasePackage } from "../revenuecat.js";
 import { useAuth } from "../AuthContext.jsx";
 
@@ -493,14 +493,14 @@ export default function Pricing() {
     if (!plan) return;
     setLoading(true);
     try {
-      const packageMap = {
-        mistico: '$rc_weekly',
-        sagrado: '$rc_monthly',
-        consulta: 'custom',
-      };
-      const packageId = packageMap[plan];
-      const result = await purchasePackage(packageId);
-      if (result) {
+      const res = await fetch('/api/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan }),
+        });
+        const data = await res.json();
+        if (data.url) { window.location.href = data.url; return; }
+        const result = { customerInfo: null };
         window.location.href = '/app';
       }
     } catch (err) {
