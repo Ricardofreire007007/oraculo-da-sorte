@@ -502,7 +502,7 @@ function Navbar({ activeSection, setActiveSection, user, login, logout }) {
 }
 
 // ── Hero ──────────────────────────────────────────────────────────
-function Hero({ onJoinWaitlist }) {
+function Hero() {
   return (
     <section style={{
       minHeight: "100vh", display: "flex", alignItems: "center",
@@ -705,7 +705,7 @@ function Pricing() {
         "✓ Histórico e estatísticas pessoais",
         "✗ Bolão espiritual",
       cta: "Assinar Místico",
-      cta: "Entrar na Waitlist Premium",
+      cta: "Assinar Místico",
       highlight: true,
     },
     {
@@ -723,7 +723,7 @@ function Pricing() {
         "✓ Badge exclusivo de fundador",
         "✓ Suporte prioritário",
       cta: "Assinar Sagrado",
-      cta: "Entrar na Waitlist Sagrado",
+      cta: "Assinar Sagrado",
       highlight: false,
     },
   ];
@@ -851,95 +851,95 @@ function Pricing() {
   );
 }
 
-// ── Waitlist Form ─────────────────────────────────────────────────
-function WaitlistForm() {
-  const [form, setForm] = useState({ email: "", birth: "", name: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [count] = useState(2487);
 
 
-  const handleSubmit = async () => {
-    if (form.email && form.birth) { const { error } = await supabase.from('waitlist').insert({ email: form.email, birth_date: form.birth, name: form.name }); if (!error) { setSubmitted(true); await fetch('/api/send-welcome-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email, name: form.name }) }); } }
-  };
 
-  return (
-    <section style={{ padding: "100px 32px", position: "relative", zIndex: 1 }}>
-      <div style={{ maxWidth: 560, margin: "0 auto" }}>
-        <div className="card-mystical" style={{ padding: "48px 40px", textAlign: "center" }}>
-          {!submitted ? (
-            <>
-              <div style={{ fontSize: 56, marginBottom: 20 }}>✨</div>
-              <h2 className="cinzel-deco gradient-text" style={{ fontSize: "clamp(1.3rem, 4vw, 2rem)", marginBottom: 12 }}>
-                Reserve seu lugar
-              </h2>
-              <p style={{ color: COLORS.textMuted, fontSize: 16, marginBottom: 8, lineHeight: 1.6 }}>
-                Junte-se a <strong style={{ color: COLORS.gold }}>{count.toLocaleString("pt-BR")}</strong> pessoas esperando o lançamento.
-              </p>
-              <p style={{ color: COLORS.textMuted, fontSize: 14, marginBottom: 32, fontStyle: "italic" }}>
-                Membros da waitlist ganham 30 dias de plano Místico grátis no lançamento.
-              </p>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 14, textAlign: "left" }}>
-                <div>
-                  <label className="cinzel" style={{ fontSize: 12, color: COLORS.gold, letterSpacing: "0.1em", display: "block", marginBottom: 8, textTransform: "uppercase" }}>
-                    Nome
-                  </label>
-                  <input type="text" placeholder="Seu nome" value={form.name}
-                    onChange={e => setForm({ ...form, name: e.target.value })} />
-                </div>
-                <div>
-                  <label className="cinzel" style={{ fontSize: 12, color: COLORS.gold, letterSpacing: "0.1em", display: "block", marginBottom: 8, textTransform: "uppercase" }}>
-                    E-mail *
-                  </label>
-                  <input type="email" placeholder="seu@email.com" value={form.email}
-                    onChange={e => setForm({ ...form, email: e.target.value })} required />
-                </div>
-                <div>
-                  <label className="cinzel" style={{ fontSize: 12, color: COLORS.gold, letterSpacing: "0.1em", display: "block", marginBottom: 8, textTransform: "uppercase" }}>
-                    Data de Nascimento *
-                  </label>
-                  <input type="date" value={form.birth}
-                    onChange={e => setForm({ ...form, birth: e.target.value })} required
-                    style={{ colorScheme: "dark" }} />
-                  <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 6, fontStyle: "italic" }}>
-                    Usado para calcular seu número de vida. Nunca compartilhado.
-                  </p>
-                </div>
-                <button className="btn-primary animate-pulse-gold" style={{ width: "100%", marginTop: 8 }} onClick={handleSubmit}>
-                  ✦ Garantir Meu Lugar Grátis
-                </button>
-              </div>
 
-              {/* Trust signals */}
-              <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 24 }}>
-                {["🔒 Sem spam", "🚫 Sem cartão", "✓ Gratuito"].map(t => (
-                  <span key={t} style={{ fontSize: 13, color: COLORS.textMuted }}>{t}</span>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="animate-fadeInUp">
-              <div style={{ fontSize: 72, marginBottom: 20 }}>🌟</div>
-              <h2 className="cinzel-deco gradient-text" style={{ fontSize: "1.8rem", marginBottom: 16 }}>
-                Os astros receberam seu pedido!
-              </h2>
-              <p style={{ color: COLORS.textMuted, fontSize: 16, lineHeight: 1.8 }}>
-                Você é o <strong style={{ color: COLORS.gold }}>#{count + 1}</strong> na lista.
-                Avisaremos em <strong style={{ color: COLORS.text }}>{form.email}</strong> assim que o Oráculo abrir as portas.
-              </p>
-              <div style={{ marginTop: 28, padding: "20px", background: "rgba(201,168,76,0.08)", borderRadius: 10, border: "1px solid rgba(201,168,76,0.2)" }}>
-                <p className="cinzel" style={{ color: COLORS.gold, fontSize: 13, marginBottom: 8 }}>🎁 SEU BENEFÍCIO RESERVADO</p>
-                <p style={{ color: COLORS.text, fontSize: 15 }}>30 dias do Plano Místico gratuitos no lançamento</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ── Testimonials ──────────────────────────────────────────────────
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function Testimonials() {
   const items = [
     { name: "Carla M.", city: "São Paulo – SP", text: "Uso para escolher meus números com mais intenção. A experiência do ritual mudou minha relação com o jogo.", stars: 5 },
@@ -1092,11 +1092,11 @@ export default function App() {
   const [communityWins] = useState(247);
   const [communityTotal] = useState(184930);
   const [activeSection, setActiveSection] = useState("Início");
-  const waitlistRef = useRef(null);
+
   const { user, profile, loading, showOnboarding, login, logout, completeOnboarding } = useAuth();
 
-  const scrollToWaitlist = () => {
-    waitlistRef.current?.scrollIntoView({ behavior: "smooth" });
+
+
   };
 
   return (
@@ -1110,7 +1110,7 @@ export default function App() {
       <Navbar activeSection={activeSection} setActiveSection={setActiveSection} user={user} login={login} logout={logout} />
 
       <main style={{ position: "relative", zIndex: 1 }}>
-        <Hero onJoinWaitlist={scrollToWaitlist} />
+        <Hero />
         <HowItWorks />
         <Features />
         <Pricing />
