@@ -723,7 +723,7 @@ function Pricing() {
         "✓ Badge exclusivo de fundador",
         "✓ Suporte prioritário",
       cta: "Assinar Sagrado",
-      cta: "Assinar Sagrado",
+
       highlight: false,
     },
   ];
