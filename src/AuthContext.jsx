@@ -12,7 +12,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Função para atualizar o perfil (usada após pagamento)
   const refreshProfile = useCallback(async () => {
     if (!user) return;
     const userProfile = await getProfile(user.id);
@@ -73,6 +72,7 @@ export function AuthProvider({ children }) {
       full_name: formData.fullName,
       birth_date: formData.birthDate,
       birth_city: formData.birthCity,
+      location: formData.location || null,
     });
     setShowOnboarding(false);
   };
