@@ -565,8 +565,7 @@ function Hero() {
         <div style={{ display: "flex", justifyContent: "center" }}>
           <MysticalOrb />
         </div>
-      </div>
-    </section>
+      </section>
   );
 }
 
