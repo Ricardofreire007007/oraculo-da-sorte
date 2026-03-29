@@ -1,4 +1,4 @@
-﻿import Stripe from 'stripe';
+import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: plan === 'consulta' ? 'payment' : 'subscription',
+      metadata: { plan: plan },
       success_url: 'https://oraculo-da-sorte.vercel.app/app?pagamento=sucesso',
       cancel_url: 'https://oraculo-da-sorte.vercel.app/',
     });

@@ -1,5 +1,5 @@
 // src/AuthContext.jsx
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, getUser, getProfile, signInWithGoogle, signOut } from './auth.js';
 
 const AuthContext = createContext({});
@@ -12,8 +12,16 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
 
+  // Função para atualizar o perfil (usada após pagamento)
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const userProfile = await getProfile(user.id);
+    if (userProfile) {
+      setProfile(userProfile);
+    }
+  }, [user]);
+
   useEffect(() => {
-    // Verificar sessão atual
     const checkSession = async () => {
       const currentUser = await getUser();
       if (currentUser) {
@@ -30,7 +38,6 @@ export function AuthProvider({ children }) {
 
     checkSession();
 
-    // Ouvir mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
@@ -79,6 +86,7 @@ export function AuthProvider({ children }) {
       login,
       logout,
       completeOnboarding,
+      refreshProfile,
     }}>
       {children}
     </AuthContext.Provider>

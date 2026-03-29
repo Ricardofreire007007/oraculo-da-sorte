@@ -1,4 +1,4 @@
-﻿import Stripe from 'stripe';
+import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -33,7 +33,8 @@ export default async function handler(req, res) {
 
   if (event.type === 'checkout.session.completed') {
     const customerEmail = session.customer_details?.email;
-    const plan = session.mode === 'subscription' ? 'paid' : 'consulta';
+    // Ler o plano do metadata (mistico, sagrado, consulta)
+    const plan = session.metadata?.plan || (session.mode === 'subscription' ? 'paid' : 'consulta');
 
     if (customerEmail) {
       const { error } = await supabase

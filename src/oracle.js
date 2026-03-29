@@ -1,10 +1,22 @@
 // src/oracle.js — Motor Místico do Oráculo da Sorte
 
 // ══════════════════════════════════════
+//  LOTERIAS SUPORTADAS
+// ══════════════════════════════════════
+export const LOTTERIES = {
+  megasena:  { name: 'Mega-Sena',   emoji: '🎰', range: 60, pick: 6,  premium: false, desc: '6 números de 1 a 60' },
+  lotofacil: { name: 'Lotofácil',   emoji: '🍀', range: 25, pick: 15, premium: true,  desc: '15 números de 1 a 25' },
+  quina:     { name: 'Quina',       emoji: '⭐', range: 80, pick: 5,  premium: true,  desc: '5 números de 1 a 80' },
+  lotomania: { name: 'Lotomania',   emoji: '🌀', range: 100, pick: 50, premium: true, desc: '50 números de 0 a 99' },
+  duplasena: { name: 'Dupla Sena',  emoji: '🎲', range: 50, pick: 6,  premium: true,  desc: '6 números de 1 a 50' },
+  timemania: { name: 'Timemania',   emoji: '⚽', range: 80, pick: 7,  premium: true,  desc: '7 números de 1 a 80' },
+  diadesorte:{ name: 'Dia de Sorte',emoji: '☀️', range: 31, pick: 7,  premium: true,  desc: '7 números de 1 a 31' },
+};
+
+// ══════════════════════════════════════
 //  FASE DA LUA
 // ══════════════════════════════════════
 export function getMoonPhase(date = new Date()) {
-  // Lua nova conhecida: 11 Jan 2024
   const knownNewMoon = new Date(2024, 0, 11);
   const lunarCycle = 29.53059;
   const daysSince = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
@@ -22,10 +34,25 @@ export function getMoonPhase(date = new Date()) {
 }
 
 // ══════════════════════════════════════
+//  ORIXÁS DO DIA
+// ══════════════════════════════════════
+export function getOrixaOfDay(date = new Date()) {
+  const orixas = [
+    { name: 'Exú', emoji: '🔥', cor: 'Vermelho e Preto', element: 'Fogo', affirmation: 'Os caminhos se abrem para mim. Cada escolha é uma encruzilhada de possibilidades.' },
+    { name: 'Ogum', emoji: '⚔️', cor: 'Azul e Verde', element: 'Ferro', affirmation: 'Tenho força e coragem para conquistar meus objetivos. A vitória me pertence.' },
+    { name: 'Oxóssi', emoji: '🏹', cor: 'Verde', element: 'Mata', affirmation: 'Minha mira é certeira. A abundância da natureza me guia.' },
+    { name: 'Xangô', emoji: '⚡', cor: 'Vermelho e Branco', element: 'Trovão', affirmation: 'A justiça divina age a meu favor. Minha palavra tem poder.' },
+    { name: 'Oxum', emoji: '💛', cor: 'Amarelo e Dourado', element: 'Água Doce', affirmation: 'A prosperidade flui para mim como as águas do rio. Mereço abundância.' },
+    { name: 'Iemanjá', emoji: '🌊', cor: 'Azul e Branco', element: 'Mar', affirmation: 'As ondas do destino me levam ao meu bem maior. Confio no fluxo da vida.' },
+    { name: 'Oxalá', emoji: '✨', cor: 'Branco', element: 'Ar', affirmation: 'A paz e a sabedoria iluminam minhas escolhas. Estou em harmonia com o universo.' },
+  ];
+  return orixas[date.getDay()];
+}
+
+// ══════════════════════════════════════
 //  NUMEROLOGIA PITAGÓRICA
 // ══════════════════════════════════════
 export function calcLifeNumber(birthDate) {
-  // birthDate no formato "YYYY-MM-DD"
   const digits = birthDate.replace(/-/g, '').split('').map(Number);
   let sum = digits.reduce((a, b) => a + b, 0);
   while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
@@ -34,7 +61,6 @@ export function calcLifeNumber(birthDate) {
   return sum;
 }
 
-// Vibração numerológica do dia
 function dayVibration(date = new Date()) {
   const d = date.getDate();
   const m = date.getMonth() + 1;
@@ -47,18 +73,27 @@ function dayVibration(date = new Date()) {
 }
 
 // ══════════════════════════════════════
-//  GERADOR DE NÚMEROS MÍSTICOS
+//  GERADOR DE NÚMEROS MÍSTICOS (MULTI-LOTERIA)
 // ══════════════════════════════════════
-export function generateMysticNumbers(birthDate) {
+export function generateMysticNumbers(birthDate, lotteryKey = 'megasena') {
+  const lottery = LOTTERIES[lotteryKey];
+  if (!lottery) return null;
+
+  const { range, pick } = lottery;
+  const minNum = lotteryKey === 'lotomania' ? 0 : 1;
+  const maxNum = lotteryKey === 'lotomania' ? 99 : range;
+  const totalRange = maxNum - minNum + 1;
+
   const lifeNumber = calcLifeNumber(birthDate);
   const moon = getMoonPhase();
   const dayVib = dayVibration();
+  const orixa = getOrixaOfDay();
 
-  // Seed baseada na data de nascimento + dia atual + fase lunar
   const today = new Date();
-  const seed = lifeNumber * 1000 + today.getDate() * 100 + (today.getMonth() + 1) * 10 + dayVib;
+  // Seed inclui a loteria para gerar números diferentes por jogo
+  const lotterySeed = lotteryKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const seed = lifeNumber * 1000 + today.getDate() * 100 + (today.getMonth() + 1) * 10 + dayVib + lotterySeed;
 
-  // Pseudo-random baseado na seed (determinístico por dia)
   function seededRandom(s) {
     let x = Math.sin(s) * 10000;
     return x - Math.floor(x);
@@ -68,75 +103,75 @@ export function generateMysticNumbers(birthDate) {
   let attempts = 0;
   const maxAttempts = 5000;
 
+  // Para loterias com muitos números (lotomania = 50), relaxar validações
+  const needsValidation = pick <= 15;
+
   while (allNumbers.length === 0 && attempts < maxAttempts) {
     attempts++;
     const candidate = [];
     const used = new Set();
 
-    // 1. Inclui 1-2 números de poder da lua
-    const moonNums = moon.powerNumbers.filter(n => n >= 1 && n <= 60);
-    const moonPick = moonNums[Math.floor(seededRandom(seed + attempts) * moonNums.length)];
-    if (moonPick) {
+    // 1. Inclui 1-2 números de poder da lua (filtrados pelo range)
+    const moonNums = moon.powerNumbers.filter(n => n >= minNum && n <= maxNum);
+    if (moonNums.length > 0) {
+      const moonPick = moonNums[Math.floor(seededRandom(seed + attempts) * moonNums.length)];
       candidate.push(moonPick);
       used.add(moonPick);
     }
 
     // 2. Número baseado no número de vida
-    const lifeNum = ((lifeNumber * (today.getDate() + attempts)) % 60) + 1;
-    if (!used.has(lifeNum) && lifeNum >= 1 && lifeNum <= 60) {
+    const lifeNum = ((lifeNumber * (today.getDate() + attempts)) % totalRange) + minNum;
+    if (!used.has(lifeNum) && lifeNum >= minNum && lifeNum <= maxNum) {
       candidate.push(lifeNum);
       used.add(lifeNum);
     }
 
     // 3. Número baseado na vibração do dia
-    const vibNum = ((dayVib * 7 + attempts * 3) % 60) + 1;
-    if (!used.has(vibNum) && vibNum >= 1 && vibNum <= 60) {
+    const vibNum = ((dayVib * 7 + attempts * 3) % totalRange) + minNum;
+    if (!used.has(vibNum) && vibNum >= minNum && vibNum <= maxNum) {
       candidate.push(vibNum);
       used.add(vibNum);
     }
 
-    // 4. Preencher restante até 6 números
-    while (candidate.length < 6) {
-      const n = Math.floor(seededRandom(seed + candidate.length * 13 + attempts * 7) * 60) + 1;
+    // 4. Preencher restante
+    let fillAttempts = 0;
+    while (candidate.length < pick && fillAttempts < 1000) {
+      const n = Math.floor(seededRandom(seed + candidate.length * 13 + attempts * 7 + fillAttempts) * totalRange) + minNum;
       if (!used.has(n)) {
         candidate.push(n);
         used.add(n);
       }
-      attempts++;
-      if (attempts > maxAttempts) break;
+      fillAttempts++;
     }
 
-    if (candidate.length !== 6) continue;
+    if (candidate.length !== pick) continue;
 
-    // ══════════════════════════════════════
-    //  VALIDAR PRESSUPOSTOS
-    // ══════════════════════════════════════
     const sorted = candidate.sort((a, b) => a - b);
-    const pares = sorted.filter(n => n % 2 === 0).length;
-    const impares = sorted.filter(n => n % 2 !== 0).length;
-    const baixos = sorted.filter(n => n <= 30).length;
-    const altos = sorted.filter(n => n > 30).length;
-    const soma = sorted.reduce((a, b) => a + b, 0);
 
-    // Pressuposto 1: 3 pares + 3 ímpares
-    if (pares !== 3 || impares !== 3) continue;
+    // Validação proporcional (só pra loterias com poucos números)
+    if (needsValidation && pick >= 5 && pick <= 7) {
+      const midpoint = Math.floor((minNum + maxNum) / 2);
+      const pares = sorted.filter(n => n % 2 === 0).length;
+      const impares = pick - pares;
+      const baixos = sorted.filter(n => n <= midpoint).length;
+      const altos = pick - baixos;
 
-    // Pressuposto 2: 3 baixos + 3 altos
-    if (baixos !== 3 || altos !== 3) continue;
+      // Pelo menos 40% de cada lado
+      const minBalance = Math.floor(pick * 0.35);
+      if (pares < minBalance || impares < minBalance) continue;
+      if (baixos < minBalance || altos < minBalance) continue;
+    }
 
-    // Pressuposto 3: Soma entre 175 e 210
-    if (soma < 175 || soma > 210) continue;
-
-    // Todos os pressupostos satisfeitos!
     allNumbers.push(...sorted);
+    break;
   }
 
-  // Fallback se não encontrou combinação perfeita
+  // Fallback
   if (allNumbers.length === 0) {
     const fallback = [];
     const used = new Set();
-    while (fallback.length < 6) {
-      const n = Math.floor(seededRandom(seed + fallback.length * 17) * 60) + 1;
+    while (fallback.length < pick) {
+      const n = Math.floor(seededRandom(seed + fallback.length * 17) * totalRange) + minNum;
       if (!used.has(n)) {
         fallback.push(n);
         used.add(n);
@@ -145,17 +180,23 @@ export function generateMysticNumbers(birthDate) {
     allNumbers.push(...fallback.sort((a, b) => a - b));
   }
 
+  const finalNumbers = allNumbers.slice(0, pick);
+  const midpoint = Math.floor((minNum + maxNum) / 2);
+
   return {
-    numbers: allNumbers.slice(0, 6),
+    numbers: finalNumbers,
+    lottery: lottery,
+    lotteryKey,
     lifeNumber,
     moon,
+    orixa,
     dayVibration: dayVib,
     pressupostos: {
-      pares: allNumbers.slice(0, 6).filter(n => n % 2 === 0).length,
-      impares: allNumbers.slice(0, 6).filter(n => n % 2 !== 0).length,
-      baixos: allNumbers.slice(0, 6).filter(n => n <= 30).length,
-      altos: allNumbers.slice(0, 6).filter(n => n > 30).length,
-      soma: allNumbers.slice(0, 6).reduce((a, b) => a + b, 0),
+      pares: finalNumbers.filter(n => n % 2 === 0).length,
+      impares: finalNumbers.filter(n => n % 2 !== 0).length,
+      baixos: finalNumbers.filter(n => n <= midpoint).length,
+      altos: finalNumbers.filter(n => n > midpoint).length,
+      soma: finalNumbers.reduce((a, b) => a + b, 0),
     },
   };
 }
