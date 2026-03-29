@@ -1,4 +1,4 @@
-﻿import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -487,7 +487,7 @@ function Navbar({ activeSection, setActiveSection, user, login, logout }) {
             {item}
           </span>
         ))}
-{user ? (
+        {user ? (
           <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={logout}>
             Sair
           </button>
@@ -511,17 +511,6 @@ function Hero() {
       <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
         {/* Left */}
         <div className="animate-fadeInUp">
-
-
-
-
-
-
-
-
-
-          </div>
-
           <h1 className="cinzel-deco" style={{
             fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.2,
             marginBottom: 20,
@@ -565,7 +554,8 @@ function Hero() {
         <div style={{ display: "flex", justifyContent: "center" }}>
           <MysticalOrb />
         </div>
-      </section>
+      </div>
+    </section>
   );
 }
 
@@ -692,7 +682,7 @@ function Pricing() {
       name: "Místico",
       icon: "🔮",
       price: { mensal: "R$9,90", anual: "R$7,90" },
-      period: billingTab === "anual" ? "/semana � cobrado anualmente" : "/semana",
+      period: billingTab === "anual" ? "/semana — cobrado anualmente" : "/semana",
       color: COLORS.gold,
       badge: "Mais Popular",
       features: [
@@ -703,7 +693,7 @@ function Pricing() {
         "✓ Ritual dos Orixás completo",
         "✓ Histórico e estatísticas pessoais",
         "✗ Bolão espiritual",
-      cta: "Assinar Místico",
+      ],
       cta: "Assinar Místico",
       highlight: true,
     },
@@ -711,7 +701,7 @@ function Pricing() {
       name: "Sagrado",
       icon: "👑",
       price: { mensal: "R$24,90", anual: "R$19,90" },
-      period: billingTab === "anual" ? "/semana � cobrado anualmente" : "/semana",
+      period: billingTab === "anual" ? "/semana — cobrado anualmente" : "/semana",
       color: COLORS.amber,
       features: [
         "✓ Tudo do plano Místico",
@@ -721,8 +711,8 @@ function Pricing() {
         "✓ Acesso antecipado a novidades",
         "✓ Badge exclusivo de fundador",
         "✓ Suporte prioritário",
+      ],
       cta: "Assinar Sagrado",
-
       highlight: false,
     },
   ];
@@ -810,7 +800,7 @@ function Pricing() {
               <button
                 className={plan.highlight ? "btn-primary" : "btn-outline"}
                 style={{ width: "100%" }}
-              onClick={() => plan.name === "Místico" ? handleCheckout("mistico") : plan.name === "Sagrado" ? handleCheckout("sagrado") : null}
+                onClick={() => plan.name === "Místico" ? handleCheckout("mistico") : plan.name === "Sagrado" ? handleCheckout("sagrado") : null}
               >
                 {plan.cta}
               </button>
@@ -850,95 +840,7 @@ function Pricing() {
   );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// ── Testimonials ──────────────────────────────────────────────────
 function Testimonials() {
   const items = [
     { name: "Carla M.", city: "São Paulo – SP", text: "Uso para escolher meus números com mais intenção. A experiência do ritual mudou minha relação com o jogo.", stars: 5 },
@@ -1086,7 +988,7 @@ function Footer() {
   );
 }
 
-// ── Content Strategy Panel ────────────────────────────────────────
+// ── Main App ──────────────────────────────────────────────────────
 export default function App() {
   const [communityWins] = useState(247);
   const [communityTotal] = useState(184930);
@@ -1094,13 +996,9 @@ export default function App() {
 
   const { user, profile, loading, showOnboarding, login, logout, completeOnboarding } = useAuth();
 
-
-
-  };
-
   return (
     <>
-     <style>{styles}</style>
+      <style>{styles}</style>
       {showOnboarding && user && (
         <OnboardingPopup userId={user.id} onComplete={completeOnboarding} />
       )}
@@ -1114,8 +1012,6 @@ export default function App() {
         <Features />
         <Pricing />
         <Testimonials />
-
-
         <FAQ />
         <LegalDisclaimer />
       </main>
