@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+﻿import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -507,7 +507,7 @@ async function handleCheckout(plan) {
 function Pricing() {
   var [billingTab, setBillingTab] = useState("mensal");
   var plans = [
-    { name: "Livre", icon: "🌟", price: { mensal: "R$0", anual: "R$0" }, period: "para sempre", color: COLORS.textMuted, features: ["✓ Mega-Sena apenas", "✓ 1 consulta por dia", "✓ Tarot básico", "✗ Todas as loterias", "✗ Consultas ilimitadas", "✗ Todos os rituais"], cta: "Começar Grátis", highlight: false },
+    { name: "3 Consultas", icon: "✧", price: { mensal: "R$6,00", anual: "R$6,00" }, period: "/ pacote", color: COLORS.textMuted, features: ["✓ 3 consultas completas", "✓ Todas as loterias brasileiras", "✓ Análise mística completa", "✓ Apenas R$2,00 por consulta"], cta: "Comprar Pacote", highlight: false },
     { name: "Místico", icon: "🔮", price: { mensal: "R$9,90", anual: "R$7,90" }, period: billingTab === "anual" ? "/semana — anual" : "/semana", color: COLORS.gold, badge: "Mais Popular", features: ["✓ Todas as 7 loterias", "✓ Consultas ilimitadas", "✓ 5 caminhos místicos completos", "✓ Orixás + Anjos + Planetária", "✓ Análise de padrões históricos", "✗ Bolão espiritual"], cta: "Assinar Místico", highlight: true },
     { name: "Sagrado", icon: "👑", price: { mensal: "R$24,90", anual: "R$19,90" }, period: billingTab === "anual" ? "/semana — anual" : "/semana", color: COLORS.amber, features: ["✓ Tudo do plano Místico", "✓ Bolão espiritual ilimitado", "✓ Consultor IA via chat", "✓ Relatório mensal", "✓ Badge de fundador", "✓ Suporte prioritário"], cta: "Assinar Sagrado", highlight: false },
   ];
