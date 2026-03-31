@@ -1,6 +1,5 @@
 ﻿import { useState } from "react";
 import { purchasePackage } from "../revenuecat.js";
-import { useAuth } from "../AuthContext.jsx";
 
 /*
  * ─────────────────────────────────────────────
@@ -28,21 +27,21 @@ const PLAN_IDS = {
 // ══════════════════════════════════════
 const plans = [
   {
-    id: "livre",
-    name: "Livre",
-    icon: "☽",
-    price: "Grátis",
-    period: "",
-    description: "Para quem quer explorar as energias do acaso",
+    id: "consulta",
+    name: "3 Consultas",
+    icon: "✧",
+    price: "R$ 6,00",
+    period: "/ pacote",
+    description: "Análise mística completa sem compromisso de assinatura",
     features: [
-      "1 consulta por dia",
-      "Mega-Sena apenas",
-      "Números aleatórios básicos",
-      "Sem análise mística",
+      "3 consultas completas",
+      "Todas as loterias brasileiras",
+      "Análise mística completa",
+      "Apenas R$2,00 por consulta",
     ],
-    cta: "Começar Grátis",
+    cta: "Comprar Pacote",
     popular: false,
-    stripe: null,
+    stripe: "consulta",
   },
   {
     id: "mistico",
@@ -481,11 +480,8 @@ const s = {
 //  COMPONENTE PRINCIPAL
 // ══════════════════════════════════════
 export default function Pricing() {
- const { user, login } = useAuth();
   const [hoveredCard, setHoveredCard] = useState(null);
-  const [hoveredPpu, setHoveredPpu] = useState(false);
   const [btnHover, setBtnHover] = useState(null);
-  const [ppuBtnHover, setPpuBtnHover] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // ── Stripe Checkout ──
@@ -507,14 +503,6 @@ export default function Pricing() {
       console.error('Erro no checkout:', err);
     }
     setLoading(false);
-  };
-
-  const handleFree = () => {
-    if (!user) {
-      login();
-    } else {
-      window.location.href = "/app";
-    }
   };
 
   return (
@@ -606,11 +594,7 @@ export default function Pricing() {
 
               {/* CTA Button */}
               <button
-                onClick={() =>
-                  plan.stripe
-                    ? handleCheckout(plan.stripe)
-                    : handleFree()
-                }
+                onClick={() => handleCheckout(plan.stripe)}
                 onMouseEnter={() => setBtnHover(plan.id)}
                 onMouseLeave={() => setBtnHover(null)}
                 style={
@@ -624,34 +608,6 @@ export default function Pricing() {
             </div>
           );
         })}
-      </div>
-
-      {/* Pay-per-use */}
-      <div style={s.payPerUse}>
-        <div
-          style={s.ppuBox(hoveredPpu)}
-          onMouseEnter={() => setHoveredPpu(true)}
-          onMouseLeave={() => setHoveredPpu(false)}
-        >
-          <h3 style={s.ppuTitle}>Pacote 3 Consultas</h3>
-          <p style={s.ppuDesc}>
-            Faça 3 consultas ao Oráculo
-            com análise mística completa, sem precisar de assinatura. Apenas R$2,00 por consulta!
-          </p>
-          <div style={s.ppuPrice}>
-            <span style={s.ppuValue}>R$ 6,00</span>
-            <span style={s.ppuPer}>/3 consultas</span>
-          </div>
-          <br />
-          <button
-            onClick={() => handleCheckout("consulta")}
-            onMouseEnter={() => setPpuBtnHover(true)}
-            onMouseLeave={() => setPpuBtnHover(false)}
-            style={s.ppuBtn(ppuBtnHover)}
-          >
-            Comprar Pacote de 3 Consultas
-          </button>
-        </div>
       </div>
 
       {/* Footer */}
