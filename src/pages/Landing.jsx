@@ -534,8 +534,8 @@ function Pricing() {
           ))}
         </div>
         <div style={{ marginTop: 40, padding: "24px 32px", background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, textAlign: "center" }}>
-          <span className="cinzel" style={{ color: COLORS.gold, fontSize: 14 }}>💡 Prefere não assinar?</span>
-          <span style={{ color: COLORS.textMuted, fontSize: 15, marginLeft: 12 }}>Pacote de 3 consultas por <strong style={{ color: COLORS.text }}>R$6,00</strong> — sem assinatura.</span>
+          <span className="cinzel" style={{ color: COLORS.gold, fontSize: 14 }}>✨ Quer só experimentar?</span>
+          <span style={{ color: COLORS.textMuted, fontSize: 15, marginLeft: 12 }}>Comece grátis com 1 consulta diária na Mega-Sena — <strong style={{ color: COLORS.text }}>sem cartão</strong>.</span>
         </div>
       </div>
     </section>
