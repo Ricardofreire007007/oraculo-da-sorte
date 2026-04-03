@@ -371,6 +371,12 @@ function FeatureResultHeader({ result }) {
         <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 8 }}>
           Elemento: {fd.rulingPlanet.element} · Influência: {fd.rulingPlanet.influence}
         </p>
+        {fd.planetNarrative && (
+          <div style={{ marginTop: 16, padding: "14px 18px", background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.12)", borderRadius: 10 }}>
+            <p style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.8, fontFamily: "'EB Garamond', serif", marginBottom: 10 }}>{fd.planetNarrative.fullNarrative}</p>
+            <p style={{ fontSize: 12, color: "#A78BFA", fontStyle: "italic", textAlign: "center" }}>{fd.planetNarrative.cosmicTip}</p>
+          </div>
+        )}
       </div>
     );
   }

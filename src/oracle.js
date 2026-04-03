@@ -449,6 +449,28 @@ function generateAnjos(birthDate, lotteryKey) {
 // ══════════════════════════════════════
 //  ALGORITMO 4: PLANETÁRIA
 // ══════════════════════════════════════
+var PLANET_DETAILS = {
+  Sol:      { deepInfluence: "O Sol e o centro do sistema, a fonte de toda vitalidade. Quando rege o dia, seus numeros brilham com a energia do sucesso, da lideranca e da clareza. E o astro mais favoravel para jogos de sorte, pois irradia confianca e poder de manifestacao.", cosmicTip: "Jogue com confianca — a energia solar amplifica suas intencoes." },
+  Lua:      { deepInfluence: "A Lua governa o mundo emocional e as mares do destino. Sob sua regencia, a intuicao atinge o pico e os numeros emergem do subconsciente profundo. A Lua conecta voce aos ciclos naturais, revelando padroes ocultos que a mente racional nao alcanca.", cosmicTip: "Confie nos seus pressentimentos — a Lua intensifica sua percepcao." },
+  Marte:    { deepInfluence: "Marte e o guerreiro cosmico, trazendo coragem e energia de conquista. Seus numeros pulsam com determinacao e forca bruta. Sob Marte, a acao decisiva e recompensada e a ousadia se transforma em resultados concretos.", cosmicTip: "Seja ousado nas suas escolhas — Marte favorece quem age com determinacao." },
+  Mercurio: { deepInfluence: "Mercurio e o mensageiro dos deuses, o planeta da comunicacao rapida e da inteligencia agil. Seus numeros surgem como insights subitos, conexoes inesperadas entre dados aparentemente aleatorios. A velocidade mental e sua aliada.", cosmicTip: "Preste atencao a sinais e coincidencias — Mercurio comunica atraves deles." },
+  Jupiter:  { deepInfluence: "Jupiter e o grande benfeitor, o planeta da expansao e da abundancia ilimitada. Sua influencia e a mais generosa do zodiaco, multiplicando as oportunidades e ampliando os horizontes. Numeros sob Jupiter carregam a energia da prosperidade em grande escala.", cosmicTip: "Pense grande — Jupiter expande tudo o que toca, inclusive sua sorte." },
+  Venus:    { deepInfluence: "Venus e o planeta da beleza, harmonia e atracao magnetica. Sua energia cria um campo de atracao que puxa os numeros certos na sua direcao. Sob Venus, a sorte vem com graciosidade, como um presente do universo.", cosmicTip: "Cultive gratidao e beleza ao seu redor — Venus responde a vibracoes harmoniosas." },
+  Saturno:  { deepInfluence: "Saturno e o mestre do tempo e da disciplina cosmica. Seus numeros sao conquistados, nao dados. Sob Saturno, a recompensa vem para quem demonstrou paciencia e persistencia. E o planeta que transforma esforco em resultados duradouros.", cosmicTip: "A disciplina e a paciencia sao suas chaves — Saturno recompensa quem persevera." },
+};
+
+function buildPlanetNarrative(planet, planetaryHour, moon, location) {
+  var detail = PLANET_DETAILS[planet.name] || {};
+  var narrative = detail.deepInfluence || ("A energia de " + planet.name + " influencia seus numeros hoje.");
+  if (planet.name === planetaryHour.name) {
+    narrative += " Neste momento especial, planeta regente e hora planetaria coincidem, criando um Alinhamento Perfeito — uma janela cosmica rara onde a energia astral se concentra com intensidade maxima.";
+  } else {
+    narrative += " A combinacao de " + planet.name + " (regente do dia) com " + planetaryHour.name + " (hora planetaria) cria uma fusao unica de energias: " + planet.element + " encontra " + planetaryHour.element + ", gerando numeros com dupla influencia astral.";
+  }
+  narrative += " Sob a " + moon.name + ", a energia de " + moon.influence + " amplifica esta configuracao celeste.";
+  return { fullNarrative: narrative, cosmicTip: detail.cosmicTip || "Siga a orientacao dos astros." };
+}
+
 function generatePlanetaria(birthDate, lotteryKey, location) {
   var lottery = LOTTERIES[lotteryKey];
   var minNum = lotteryKey === 'lotomania' ? 0 : 1;
@@ -478,7 +500,8 @@ function generatePlanetaria(birthDate, lotteryKey, location) {
       planetaryHour: { name: planetaryHour.name, emoji: planetaryHour.emoji },
       alignment: planet.name === planetaryHour.name
         ? 'Alinhamento Perfeito! Planeta regente e hora planetária coincidem.'
-        : 'Combinação de ' + planet.name + ' (dia) com ' + planetaryHour.name + ' (hora).',
+        : 'Combinacao de ' + planet.name + ' (dia) com ' + planetaryHour.name + ' (hora).',
+      planetNarrative: buildPlanetNarrative(planet, planetaryHour, moon, location),
     },
   };
 }
