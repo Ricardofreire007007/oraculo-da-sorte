@@ -9,7 +9,7 @@ export const LOTTERIES = {
   quina:      { name: 'Quina',        emoji: '⭐', range: 80,  pick: 5,  premium: true,  desc: '5 de 1-80' },
   lotomania:  { name: 'Lotomania',    emoji: '🌀', range: 100, pick: 50, premium: true,  desc: '50 de 0-99' },
   duplasena:  { name: 'Dupla Sena',   emoji: '🎲', range: 50,  pick: 6,  premium: true,  desc: '6 de 1-50' },
-  timemania:  { name: 'Timemania',    emoji: '⚽', range: 80,  pick: 7,  premium: true,  desc: '7 de 1-80' },
+  timemania:  { name: 'Timemania',    emoji: '\u26bd', range: 80,  pick: 10, premium: true,  desc: '10 de 1-80' },
   diadesorte: { name: 'Dia de Sorte', emoji: '☀️', range: 31,  pick: 7,  premium: true,  desc: '7 de 1-31' },
 };
 
@@ -22,7 +22,7 @@ const LOTTERY_CONSTRAINTS = {
   quina:      { paresMin:1, paresMax:3, baixosMin:1, baixosMax:3, somaMin:145, somaMax:260, maxConsecutivos:3, midPoint:40 },
   lotomania:  { paresMin:22, paresMax:28, baixosMin:22, baixosMax:28, somaMin:2315, somaMax:2635, maxConsecutivos:6, midPoint:49 },
   duplasena:  { paresMin:2, paresMax:4, baixosMin:2, baixosMax:4, somaMin:115, somaMax:190, maxConsecutivos:3, midPoint:25 },
-  timemania:  { paresMin:2, paresMax:4, baixosMin:2, baixosMax:4, somaMin:215, somaMax:350, maxConsecutivos:3, midPoint:40 },
+  timemania:  { paresMin:3, paresMax:7, baixosMin:3, baixosMax:7, somaMin:330, somaMax:480, maxConsecutivos:4, midPoint:40 },
   diadesorte: { paresMin:2, paresMax:4, baixosMin:2, baixosMax:4, somaMin:85, somaMax:140, maxConsecutivos:3, midPoint:16 },
 };
 
