@@ -405,14 +405,13 @@ function FeatureResultHeader({ result }) {
         <p style={{ fontSize: 14, color: COLORS.text, fontStyle: 'italic', textAlign: 'center', lineHeight: 1.6, fontFamily: "'EB Garamond', serif" }}>
           "{fd.dayOrixa.affirmation}"
         </p>
-        <p style={{ fontSize: 12, color: COLORS.textMuted, textAlign: 'center', marginTop: 8 }}>{fd.combinedMessage}</p>
-      </div>
         {fd.orixaNarrative && (
           <div style={{ marginTop: 16, padding: "14px 18px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.12)", borderRadius: 10 }}>
             <p style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.8, fontFamily: "'EB Garamond', serif", marginBottom: 10 }}>{fd.orixaNarrative.fullNarrative}</p>
             <p style={{ fontSize: 12, color: "#F59E0B", fontStyle: "italic", textAlign: "center" }}>{fd.orixaNarrative.ritual}</p>
           </div>
         )}
+      </div>
     );
   }
 
