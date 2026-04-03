@@ -239,6 +239,42 @@ function buildPressupostos(numbers, minNum, maxNum) {
 // ══════════════════════════════════════
 //  ALGORITMO 1: TAROT
 // ══════════════════════════════════════
+var TAROT_DETAILS = {
+  0:  { insight: "O Louco representa o salto de fe no desconhecido. Sua energia abre portas que a logica nao alcanca. Os numeros que emergem desta carta carregam a vibração do novo, do inesperado e do potencial infinito.", advice: "Confie na sua intuicao hoje — o universo conspira a seu favor." },
+  1:  { insight: "O Mago canaliza todas as forcas do universo em uma unica direção. Ele domina os quatro elementos e transforma vontade em realidade. Os numeros revelados aqui possuem o poder da manifestação consciente.", advice: "Concentre sua intencao antes de jogar — a clareza mental amplifica sua sorte." },
+  2:  { insight: "A Sacerdotisa guarda os misterios entre o visivel e o invisivel. Ela sussurra verdades que so a alma compreende. Os numeros desta carta vem do reino da intuicao pura, alem da razao.", advice: "Preste atencao aos seus sonhos e pressentimentos nas proximas horas." },
+  3:  { insight: "A Imperatriz e a mae cosmica, fonte de toda abundancia. Sua energia fertiliza cada numero com a forca da criacao. Esta carta indica um momento propicio para a prosperidade material.", advice: "A generosidade atrai mais abundancia — compartilhe sua sorte." },
+  4:  { insight: "O Imperador traz a estrutura e a ordem divina ao caos. Seus numeros sao pilares solidos, construidos sobre a sabedoria da experiencia. Esta carta indica estabilidade nos resultados.", advice: "Seja disciplinado e estrategico na sua aposta." },
+  5:  { insight: "O Hierofante conecta voce a sabedoria ancestral e as tradicoes sagradas. Os numeros que ele revela carregam a bencao dos mestres espirituais e a forca da fe.", advice: "Busque orientacao interior antes de tomar decisoes." },
+  6:  { insight: "Os Amantes representam a uniao perfeita entre opostos. Esta carta harmoniza energias complementares, criando combinacoes poderosas. Os numeros refletem o equilibrio cosmico.", advice: "Siga seu coracao — a escolha certa ja esta dentro de voce." },
+  7:  { insight: "O Carro avanca com determinacao inabalavel rumo a vitoria. Seus numeros carregam a energia do triunfo sobre obstaculos. Esta carta indica que o momento e de acao decisiva.", advice: "Mantenha o foco e a determinacao — a vitoria esta proxima." },
+  8:  { insight: "A Forca nao e brutal, mas gentil. E o dominio sereno sobre os instintos. Os numeros desta carta possuem uma resiliencia interior que supera qualquer adversidade.", advice: "A paciencia e a coragem silenciosa sao suas maiores aliadas." },
+  9:  { insight: "O Eremita ilumina o caminho com sua lanterna interior. Ele busca a verdade nas profundezas da alma. Os numeros revelados aqui vem de uma sabedoria contemplativa e profunda.", advice: "Reserve um momento de silencio antes de jogar — a resposta vem do interior." },
+  10: { insight: "A Roda da Fortuna gira sem cessar, trazendo mudancas inevitaveis. Esta e a carta mais diretamente ligada ao destino e a sorte. Os numeros emergem do proprio giro cosmico.", advice: "O ciclo esta a seu favor — aproveite este momento de transformacao positiva." },
+  11: { insight: "A Justica pesa cada acao e cada intencao na sua balanca cosmica. Os numeros que ela revela carregam o karma positivo acumulado. Esta carta indica que voce merece o que esta por vir.", advice: "Jogue com integridade e o universo retribuira." },
+  12: { insight: "O Pendurado ve o mundo de uma perspectiva invertida, revelando verdades ocultas. Seus numeros vem de angulos inesperados, combinacoes que a mente comum nao consideraria.", advice: "Abra-se para possibilidades incomuns — a sorte pode vir de onde menos espera." },
+  13: { insight: "A Morte nao e o fim, mas a grande transformacao. Ela limpa o antigo para dar espaco ao novo. Os numeros desta carta representam renascimento e renovacao total.", advice: "Deixe ir o que nao serve mais — a transformacao traz novas oportunidades." },
+  14: { insight: "A Temperanca mistura elementos opostos com maestria divina, criando harmonia perfeita. Os numeros refletem esse equilibrio sutil entre forcas cosmicas.", advice: "O equilibrio e a moderacao amplificam sua conexao com a sorte." },
+  15: { insight: "O Diabo revela o poder material em sua forma mais intensa. Esta carta liberta energias presas e canaliza ambicao em resultados concretos. Os numeros pulsam com forca terrena.", advice: "Use sua determinacao material a seu favor, mas sem apego ao resultado." },
+  16: { insight: "A Torre derruba ilusoes com a forca de um relampago divino. Seus numeros surgem da ruptura com padroes antigos, abrindo caminho para revelacoes surpreendentes.", advice: "Nao tema as mudancas subitas — elas limpam o caminho para algo maior." },
+  17: { insight: "A Estrela derrama esperanca e inspiracao sobre voce. Esta e uma das cartas mais auspiciosas para jogos de sorte. Os numeros brilham com a luz da orientacao celeste.", advice: "Confie — o universo esta enviando sinais claros. Este e um momento especial." },
+  18: { insight: "A Lua ilumina os recantos mais profundos do subconsciente. Seus numeros emergem dos sonhos, da intuicao e das marés cosmicas que governam o invisivel.", advice: "Deixe a intuicao guiar suas escolhas — o racional nem sempre enxerga a verdade." },
+  19: { insight: "O Sol irradia vitalidade, sucesso e clareza absoluta. Esta carta banha seus numeros em luz dourada, carregando-os com a energia mais positiva do Tarot.", advice: "A energia esta no auge — aproveite este momento radiante com confianca." },
+  20: { insight: "O Julgamento soa a trombeta do despertar cosmico. Esta carta chama voce para um proposito maior. Os numeros revelados carregam a forca de um chamado divino.", advice: "Ouça a voz interior — ela esta mais clara do que nunca." },
+  21: { insight: "O Mundo representa a realizacao suprema, o ciclo completo. Esta e a carta da totalidade e da plenitude cosmica. Os numeros refletem a harmonia do universo inteiro.", advice: "Voce esta alinhado com o cosmos — a completude atrai abundancia." },
+};
+
+function buildTarotNarrative(cards, lifeNum, moon) {
+  var past = TAROT_DETAILS[cards[0].n] || {};
+  var present = TAROT_DETAILS[cards[1].n] || {};
+  var future = TAROT_DETAILS[cards[2].n] || {};
+  var narrative = "A tiragem revelou uma jornada profunda: no Passado, " + cards[0].name + " mostra que " + (past.insight || cards[0].meaning).toLowerCase().slice(0, -1) + ". ",
+  narrative += "No Presente, " + cards[1].name + " indica que " + (present.insight || cards[1].meaning).toLowerCase().slice(0, -1) + ". ";
+  narrative += "No Futuro, " + cards[2].name + " revela que " + (future.insight || cards[2].meaning).toLowerCase().slice(0, -1) + ". ";
+  narrative += "Com seu Numero de Vida " + lifeNum + " sob a " + moon.name + ", a energia de " + moon.influence + " amplifica esta leitura.";
+  return { narrative: narrative, advice: future.advice || "Confie na sabedoria do Tarot." };
+}
+
 function generateTarot(birthDate, lotteryKey) {
   var lottery = LOTTERIES[lotteryKey];
   var minNum = lotteryKey === 'lotomania' ? 0 : 1;
@@ -273,7 +309,8 @@ function generateTarot(birthDate, lotteryKey) {
     pressupostos: buildPressupostos(numbers, minNum, maxNum),
     featureData: {
       cards: cards.map(function(c) { return { name: c.name, number: c.n, emoji: c.emoji, meaning: c.meaning }; }),
-      spread: 'Passado · Presente · Futuro',
+      spread: 'Passado \u00b7 Presente \u00b7 Futuro',
+      tarotNarrative: buildTarotNarrative(cards, lifeNum, moon),
     },
   };
 }

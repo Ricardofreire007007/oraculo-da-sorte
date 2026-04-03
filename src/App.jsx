@@ -1,4 +1,4 @@
-// src/App.jsx — Oráculo da Sorte: Fluxo Completo
+﻿// src/App.jsx — Oráculo da Sorte: Fluxo Completo
 import { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { generateMysticNumbers, getMoonPhase, LOTTERIES, FEATURES } from './oracle.js';
@@ -276,6 +276,12 @@ function FeatureResultHeader({ result }) {
             );
           })}
         </div>
+        {fd.tarotNarrative && (
+          <div style={{ marginTop: 20, padding: "16px 20px", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.15)", borderRadius: 10 }}>
+            <p style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.8, fontFamily: "'EB Garamond', serif", marginBottom: 12 }}>{fd.tarotNarrative.narrative}</p>
+            <p style={{ fontSize: 13, color: "#8B5CF6", fontStyle: "italic", textAlign: "center", fontFamily: "'EB Garamond', serif" }}>{fd.tarotNarrative.advice}</p>
+          </div>
+        )}
       </div>
     );
   }
