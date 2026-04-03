@@ -509,6 +509,29 @@ function generatePlanetaria(birthDate, lotteryKey, location) {
 // ══════════════════════════════════════
 //  ALGORITMO 5: ORIXÁS
 // ══════════════════════════════════════
+var ORIXA_DETAILS = {
+  Oxala:    { deepMsg: "Oxala e o pai de todos os orixas, o criador do mundo e da humanidade. Sua energia branca e pura traz clareza mental e paz espiritual. Quando Oxala rege o dia, seus numeros emergem de um espaco de sabedoria suprema, onde cada escolha e guiada pela consciencia mais elevada. Ele pede serenidade e fe — e retribui com bencaos silenciosas e profundas.", ritual: "Vista branco e acenda uma vela branca antes de jogar." },
+  Exu:      { deepMsg: "Exu e o senhor dos caminhos e das encruzilhadas, o mensageiro entre o mundo dos homens e o dos orixas. Sem Exu, nenhuma comunicacao espiritual acontece. Sua energia dinamica abre portas que pareciam fechadas e revela numeros em caminhos inesperados. Exu nao e bom nem mau — e a forca do movimento, da transformacao e da comunicacao cosmica.", ritual: "Peca licenca a Exu antes de comecar — ele abre os caminhos da sorte." },
+  Ogum:     { deepMsg: "Ogum e o guerreiro incansavel, o desbravador que abre caminhos com sua espada de ferro. Sua energia combativa remove obstaculos e limpa o terreno para que a abundancia possa fluir. Os numeros sob Ogum carregam a forca da conquista, da determinacao e da vitoria sobre as adversidades.", ritual: "Mentalize forca e coragem — Ogum protege quem luta com honra." },
+  Xango:    { deepMsg: "Xango e o orixá da justica divina, do trovao e do fogo sagrado. Sua energia poderosa equilibra o merecimento com a recompensa. Quando Xango atua, os numeros carregam a forca da verdade e da retidao — eles vem como um decreto cosmico, justo e irrevogavel.", ritual: "Peca justica e merecimento — Xango recompensa quem age com verdade." },
+  Oxossi:   { deepMsg: "Oxossi e o grande cacador, o orixá da precisao e da fartura. Com um unico disparo, ele acerta o alvo certeiro. Sua energia aguçada seus instintos e refina sua pontaria numerica. Os numeros sob Oxossi sao flechas direcionadas ao coracao da probabilidade.", ritual: "Concentre-se como um cacador — Oxossi favorece a mira precisa e paciente." },
+  Oxum:     { deepMsg: "Oxum e a rainha das aguas doces, da beleza, do amor e da prosperidade. Sua energia dourada atrai riqueza com suavidade e graca. Os numeros que fluem sob Oxum sao como as aguas de um rio — seguem o caminho natural da abundancia, sem forca, com fluidez e encanto.", ritual: "Conecte-se com agua — lave as maos antes de jogar e peca prosperidade a Oxum." },
+  Iemanja:  { deepMsg: "Iemanja e a mae de todos, a rainha do mar e das emocoes profundas. Sua energia materna abraca e protege, criando um espaco seguro onde a intuicao pode florescer. Os numeros sob Iemanja vem das profundezas do oceano cosmico — misteriosos, poderosos e carregados de protecao maternal.", ritual: "Olhe para a lua e peca protecao a Iemanja — ela guia seus numeros como guia as mares." },
+};
+
+function buildOrixaNarrative(dayOrixa, birthOrixa, moon) {
+  var detail = ORIXA_DETAILS[dayOrixa.name] || {};
+  var narrative = detail.deepMsg || ("A energia de " + dayOrixa.name + " guia seus numeros hoje.");
+  if (dayOrixa.name !== birthOrixa.name) {
+    var birthDetail = ORIXA_DETAILS[birthOrixa.name] || {};
+    narrative += " Como seu orixa de nascimento e " + birthOrixa.name + ", voce carrega tambem a essencia do elemento " + birthOrixa.element + ". A uniao dessas duas forcas — " + dayOrixa.element + " e " + birthOrixa.element + " — cria um campo espiritual unico para a geracao dos seus numeros.";
+  } else {
+    narrative += " Hoje ha um alinhamento especial: seu orixa de nascimento e o mesmo que rege este dia. Essa sincronia duplica a forca espiritual e intensifica o poder de cada numero revelado.";
+  }
+  narrative += " A " + moon.name + " adiciona a energia de " + moon.influence + " a este ritual sagrado.";
+  return { fullNarrative: narrative, ritual: detail.ritual || "Concentre-se e peca orientacao ao seu orixa." };
+}
+
 function generateOrixas(birthDate, lotteryKey) {
   var lottery = LOTTERIES[lotteryKey];
   var minNum = lotteryKey === 'lotomania' ? 0 : 1;
@@ -540,7 +563,8 @@ function generateOrixas(birthDate, lotteryKey) {
     featureData: {
       dayOrixa: { name: dayOrixa.name, emoji: dayOrixa.emoji, cor: dayOrixa.cor, element: dayOrixa.element, affirmation: dayOrixa.affirmation },
       birthOrixa: { name: birthOrixa.name, emoji: birthOrixaData.emoji, cor: birthOrixa.cor, element: birthOrixa.element },
-      combinedMessage: 'A energia de ' + dayOrixa.name + ' (regente do dia) combinada com ' + birthOrixa.name + ' (seu orixá de nascimento) canaliza uma força espiritual única.',
+      combinedMessage: 'A energia de ' + dayOrixa.name + ' (regente do dia) combinada com ' + birthOrixa.name + ' (seu orixa de nascimento) canaliza uma forca espiritual unica.',
+      orixaNarrative: buildOrixaNarrative(dayOrixa, birthOrixa, moon),
     },
   };
 }
