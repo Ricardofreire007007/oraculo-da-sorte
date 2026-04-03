@@ -268,7 +268,7 @@ function buildTarotNarrative(cards, lifeNum, moon) {
   var past = TAROT_DETAILS[cards[0].n] || {};
   var present = TAROT_DETAILS[cards[1].n] || {};
   var future = TAROT_DETAILS[cards[2].n] || {};
-  var narrative = "A tiragem revelou uma jornada profunda: no Passado, " + cards[0].name + " mostra que " + (past.insight || cards[0].meaning).toLowerCase().slice(0, -1) + ". ",
+  var narrative = "A tiragem revelou uma jornada profunda: no Passado, " + cards[0].name + " mostra que " + (past.insight || cards[0].meaning).toLowerCase().slice(0, -1) + ". ";
   narrative += "No Presente, " + cards[1].name + " indica que " + (present.insight || cards[1].meaning).toLowerCase().slice(0, -1) + ". ";
   narrative += "No Futuro, " + cards[2].name + " revela que " + (future.insight || cards[2].meaning).toLowerCase().slice(0, -1) + ". ";
   narrative += "Com seu Numero de Vida " + lifeNum + " sob a " + moon.name + ", a energia de " + moon.influence + " amplifica esta leitura.";
