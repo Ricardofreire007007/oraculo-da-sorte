@@ -207,10 +207,13 @@ function fillNumbers(initialNums, pick, range, seed, minNum, lotteryKey) {
   if (minNum === undefined) minNum = 1;
   var maxNum = minNum === 0 ? range - 1 : range;
   var totalRange = maxNum - minNum + 1;
-  var maxAttempts = 50;
+  var validInitial = initialNums.filter(function(n) { return n >= minNum && n <= maxNum; });
+  var maxAttempts = 100;
   var lastResult;
   for (var attempt = 0; attempt < maxAttempts; attempt++) {
-    var used = new Set(initialNums.filter(function(n) { return n >= minNum && n <= maxNum; }));
+    var keepCount = Math.max(1, validInitial.length - Math.floor(attempt / 5));
+    var kept = validInitial.slice(0, keepCount);
+    var used = new Set(kept);
     var result = Array.from(used);
     var attemptSeed = seed + attempt * 997;
     var i = 0;
