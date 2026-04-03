@@ -208,11 +208,15 @@ function fillNumbers(initialNums, pick, range, seed, minNum, lotteryKey) {
   var maxNum = minNum === 0 ? range - 1 : range;
   var totalRange = maxNum - minNum + 1;
   var validInitial = initialNums.filter(function(n) { return n >= minNum && n <= maxNum; });
-  var maxAttempts = 100;
-  var lastResult;
-  for (var attempt = 0; attempt < maxAttempts; attempt++) {
-    var keepCount = Math.max(1, validInitial.length - Math.floor(attempt / 5));
-    var kept = validInitial.slice(0, keepCount);
+  // Fase 1: tentar incluir numeros sagrados mantendo balizamentos
+  for (var attempt = 0; attempt < 200; attempt++) {
+    var keepCount = Math.max(0, validInitial.length - Math.floor(attempt / 4));
+    var shuffled = validInitial.slice();
+    for (var s = shuffled.length - 1; s > 0; s--) {
+      var j = Math.floor(seededRandom(seed + attempt * 31 + s) * (s + 1));
+      var tmp = shuffled[s]; shuffled[s] = shuffled[j]; shuffled[j] = tmp;
+    }
+    var kept = shuffled.slice(0, keepCount);
     var used = new Set(kept);
     var result = Array.from(used);
     var attemptSeed = seed + attempt * 997;
@@ -222,10 +226,24 @@ function fillNumbers(initialNums, pick, range, seed, minNum, lotteryKey) {
       if (!used.has(n)) { result.push(n); used.add(n); }
       i++;
     }
-    lastResult = result.sort(function(a, b) { return a - b; }).slice(0, pick);
-    if (validateConstraints(lastResult, lotteryKey)) return lastResult;
+    result = result.sort(function(a, b) { return a - b; }).slice(0, pick);
+    if (validateConstraints(result, lotteryKey)) return result;
   }
-  return lastResult;
+  // Fase 2 (garantia absoluta): gerar do zero ate cumprir balizamentos
+  for (var fb = 0; fb < 1000; fb++) {
+    var fbUsed = new Set();
+    var fbResult = [];
+    var fbSeed = seed + fb * 1999 + 12345;
+    while (fbResult.length < pick) {
+      var fn = Math.floor(seededRandom(fbSeed + fbResult.length * 17 + fb) * totalRange) + minNum;
+      fbSeed += 13;
+      if (!fbUsed.has(fn)) { fbResult.push(fn); fbUsed.add(fn); }
+    }
+    fbResult.sort(function(a, b) { return a - b; });
+    if (validateConstraints(fbResult, lotteryKey)) return fbResult;
+  }
+  // Nunca deveria chegar aqui, mas retorna ultimo resultado
+  return fbResult;
 }
 
 function buildPressupostos(numbers, minNum, maxNum) {
