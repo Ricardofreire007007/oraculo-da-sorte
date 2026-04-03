@@ -1,4 +1,4 @@
-// src/oracle.js — Motor Místico do Oráculo da Sorte (v2)
+﻿// src/oracle.js — Motor Místico do Oráculo da Sorte (v2)
 
 // ══════════════════════════════════════
 //  LOTERIAS SUPORTADAS
@@ -12,6 +12,45 @@ export const LOTTERIES = {
   timemania:  { name: 'Timemania',    emoji: '⚽', range: 80,  pick: 7,  premium: true,  desc: '7 de 1-80' },
   diadesorte: { name: 'Dia de Sorte', emoji: '☀️', range: 31,  pick: 7,  premium: true,  desc: '7 de 1-31' },
 };
+
+// ══════════════════════════════════════
+//  BALIZAMENTOS ESTATÍSTICOS POR LOTERIA
+// ══════════════════════════════════════
+const LOTTERY_CONSTRAINTS = {
+  megasena:   { paresMin:2, paresMax:4, baixosMin:2, baixosMax:4, somaMin:135, somaMax:230, maxConsecutivos:3, midPoint:30 },
+  lotofacil:  { paresMin:6, paresMax:8, baixosMin:5, baixosMax:9, somaMin:175, somaMax:215, maxConsecutivos:4, midPoint:13 },
+  quina:      { paresMin:1, paresMax:3, baixosMin:1, baixosMax:3, somaMin:145, somaMax:260, maxConsecutivos:3, midPoint:40 },
+  lotomania:  { paresMin:22, paresMax:28, baixosMin:22, baixosMax:28, somaMin:2315, somaMax:2635, maxConsecutivos:6, midPoint:49 },
+  duplasena:  { paresMin:2, paresMax:4, baixosMin:2, baixosMax:4, somaMin:115, somaMax:190, maxConsecutivos:3, midPoint:25 },
+  timemania:  { paresMin:2, paresMax:4, baixosMin:2, baixosMax:4, somaMin:215, somaMax:350, maxConsecutivos:3, midPoint:40 },
+  diadesorte: { paresMin:2, paresMax:4, baixosMin:2, baixosMax:4, somaMin:85, somaMax:140, maxConsecutivos:3, midPoint:16 },
+};
+
+function hasConsecutiveRun(nums, maxRun) {
+  var sorted = nums.slice().sort(function(a, b) { return a - b; });
+  var run = 1;
+  for (var i = 1; i < sorted.length; i++) {
+    if (sorted[i] === sorted[i - 1] + 1) { run++; if (run > maxRun) return true; }
+    else { run = 1; }
+  }
+  return false;
+}
+
+function validateConstraints(numbers, lotteryKey) {
+  var c = LOTTERY_CONSTRAINTS[lotteryKey];
+  if (!c) return true;
+  var pares = 0, baixos = 0, soma = 0;
+  for (var i = 0; i < numbers.length; i++) {
+    if (numbers[i] % 2 === 0) pares++;
+    if (numbers[i] <= c.midPoint) baixos++;
+    soma += numbers[i];
+  }
+  if (pares < c.paresMin || pares > c.paresMax) return false;
+  if (baixos < c.baixosMin || baixos > c.baixosMax) return false;
+  if (soma < c.somaMin || soma > c.somaMax) return false;
+  if (hasConsecutiveRun(numbers, c.maxConsecutivos)) return false;
+  return true;
+}
 
 // ══════════════════════════════════════
 //  FEATURES MÍSTICAS
@@ -164,19 +203,26 @@ const ORIXAS_NASCIMENTO = [
 // ══════════════════════════════════════
 //  GERADOR BASE
 // ══════════════════════════════════════
-function fillNumbers(initialNums, pick, range, seed, minNum) {
+function fillNumbers(initialNums, pick, range, seed, minNum, lotteryKey) {
   if (minNum === undefined) minNum = 1;
-  const maxNum = minNum === 0 ? range - 1 : range;
-  const totalRange = maxNum - minNum + 1;
-  const used = new Set(initialNums.filter(function(n) { return n >= minNum && n <= maxNum; }));
-  const result = Array.from(used);
-  var i = 0;
-  while (result.length < pick && i < 2000) {
-    var n = Math.floor(seededRandom(seed + result.length * 13 + i * 7) * totalRange) + minNum;
-    if (!used.has(n)) { result.push(n); used.add(n); }
-    i++;
+  var maxNum = minNum === 0 ? range - 1 : range;
+  var totalRange = maxNum - minNum + 1;
+  var maxAttempts = 50;
+  var lastResult;
+  for (var attempt = 0; attempt < maxAttempts; attempt++) {
+    var used = new Set(initialNums.filter(function(n) { return n >= minNum && n <= maxNum; }));
+    var result = Array.from(used);
+    var attemptSeed = seed + attempt * 997;
+    var i = 0;
+    while (result.length < pick && i < 2000) {
+      var n = Math.floor(seededRandom(attemptSeed + result.length * 13 + i * 7) * totalRange) + minNum;
+      if (!used.has(n)) { result.push(n); used.add(n); }
+      i++;
+    }
+    lastResult = result.sort(function(a, b) { return a - b; }).slice(0, pick);
+    if (validateConstraints(lastResult, lotteryKey)) return lastResult;
   }
-  return result.sort(function(a, b) { return a - b; }).slice(0, pick);
+  return lastResult;
 }
 
 function buildPressupostos(numbers, minNum, maxNum) {
@@ -220,7 +266,7 @@ function generateTarot(birthDate, lotteryKey) {
   var bonusNum = (arcanaSum % (maxNum - minNum + 1)) + minNum;
   if (sacredNums.indexOf(bonusNum) === -1) sacredNums.push(bonusNum);
 
-  var numbers = fillNumbers(sacredNums, lottery.pick, lottery.range, baseSeed + 333, minNum);
+  var numbers = fillNumbers(sacredNums, lottery.pick, lottery.range, baseSeed + 333, minNum, lotteryKey);
   return {
     numbers: numbers, lottery: lottery, lotteryKey: lotteryKey, lifeNumber: lifeNum, moon: moon,
     feature: 'tarot',
@@ -258,7 +304,7 @@ function generateNumerologia(birthDate, lotteryKey, fullName) {
   var yearInfluence = ((persYear * lifeNum) % (maxNum - minNum + 1)) + minNum;
   if (coreNums.indexOf(yearInfluence) === -1) coreNums.push(yearInfluence);
 
-  var numbers = fillNumbers(coreNums, lottery.pick, lottery.range, baseSeed + 555, minNum);
+  var numbers = fillNumbers(coreNums, lottery.pick, lottery.range, baseSeed + 555, minNum, lotteryKey);
   return {
     numbers: numbers, lottery: lottery, lotteryKey: lotteryKey, lifeNumber: lifeNum, moon: moon,
     feature: 'numerologia',
@@ -295,7 +341,7 @@ function generateAnjos(birthDate, lotteryKey) {
     if (angelNums.indexOf(mapped) === -1) angelNums.push(mapped);
   });
 
-  var numbers = fillNumbers(angelNums, lottery.pick, lottery.range, baseSeed + 144, minNum);
+  var numbers = fillNumbers(angelNums, lottery.pick, lottery.range, baseSeed + 144, minNum, lotteryKey);
   return {
     numbers: numbers, lottery: lottery, lotteryKey: lotteryKey, lifeNumber: lifeNum, moon: moon,
     feature: 'anjos',
@@ -329,7 +375,7 @@ function generatePlanetaria(birthDate, lotteryKey, location) {
   planetaryHour.sacred.forEach(function(n) { if (planetNums.indexOf(n) === -1) planetNums.push(n); });
   var mappedNums = planetNums.map(function(n) { return ((n - 1) % (maxNum - minNum + 1)) + minNum; });
 
-  var numbers = fillNumbers(mappedNums, lottery.pick, lottery.range, baseSeed + 777, minNum);
+  var numbers = fillNumbers(mappedNums, lottery.pick, lottery.range, baseSeed + 777, minNum, lotteryKey);
   return {
     numbers: numbers, lottery: lottery, lotteryKey: lotteryKey, lifeNumber: lifeNum, moon: moon,
     feature: 'planetaria',
@@ -370,7 +416,7 @@ function generateOrixas(birthDate, lotteryKey) {
     if (mappedNums.indexOf(mapped) === -1) mappedNums.push(mapped);
   });
 
-  var numbers = fillNumbers(mappedNums, lottery.pick, lottery.range, baseSeed + 888, minNum);
+  var numbers = fillNumbers(mappedNums, lottery.pick, lottery.range, baseSeed + 888, minNum, lotteryKey);
   return {
     numbers: numbers, lottery: lottery, lotteryKey: lotteryKey, lifeNumber: lifeNum, moon: moon,
     feature: 'orixas',
