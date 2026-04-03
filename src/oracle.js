@@ -389,6 +389,28 @@ function generateNumerologia(birthDate, lotteryKey, fullName) {
 // ══════════════════════════════════════
 //  ALGORITMO 3: ANJOS DA GUARDA
 // ══════════════════════════════════════
+var ANGEL_DETAILS = {
+  Vehuiah:  { prayer: "Vehuiah, ilumina meus caminhos com a chama da vontade divina.", deepMsg: "Vehuiah e o anjo do impulso criador, o primeiro raio de luz que rasga a escuridao. Sua presenca ativa a forca de vontade mais profunda, aquela que transforma intencao em destino. Quando Vehuiah guia seus numeros, eles carregam a energia dos novos comecos e da coragem para trilhar caminhos nunca percorridos." },
+  Jeliel:   { prayer: "Jeliel, envolve-me no manto do amor incondicional.", deepMsg: "Jeliel e o anjo do amor sagrado e da fidelidade cosmica. Sua energia harmoniza as vibracoes ao redor, criando um campo de recepcao para as bencaos do universo. Os numeros que emergem sob sua guarda vibram com a frequencia do coracao aberto." },
+  Sitael:   { prayer: "Sitael, ergue teu escudo de luz sobre minha jornada.", deepMsg: "Sitael e o anjo construtor, aquele que transforma adversidades em oportunidades. Sua protecao vai alem do fisico — ele blinda suas intencoes contra energias dispersivas. Cada numero revelado sob Sitael carrega a forca de uma fortaleza espiritual." },
+  Elemiah:  { prayer: "Elemiah, concede-me o poder da transformacao sagrada.", deepMsg: "Elemiah e o anjo do poder divino e da justica cosmica. Ele revela caminhos ocultos e desfaz bloqueios energeticos que impedem a abundancia. Seus numeros pulsam com a forca da renovacao e do merecimento espiritual." },
+  Mahasiah: { prayer: "Mahasiah, cura minha alma e abre espaco para a prosperidade.", deepMsg: "Mahasiah e o anjo da cura e da retificacao. Ele purifica o campo energetico, removendo padroes negativos que bloqueiam a sorte. Os numeros canalizados por Mahasiah emergem de um espaco limpo e renovado, prontos para atrair o melhor." },
+  Lelahel:  { prayer: "Lelahel, banhe-me na tua luz curativa e reveladora.", deepMsg: "Lelahel e o anjo da luz divina que penetra todos os veus. Sua energia ilumina numeros que permaneciam ocultos nas sombras da probabilidade. Sob sua influencia, a clareza espiritual guia cada escolha com precisao celeste." },
+  Achaiah:  { prayer: "Achaiah, ensina-me a paciencia que precede toda grande vitoria.", deepMsg: "Achaiah e o anjo da paciencia sagrada e dos segredos da natureza. Ele revela que o tempo certo e tao importante quanto os numeros certos. Sua energia sincroniza suas escolhas com os ciclos cosmicos, alinhando oportunidade e preparacao." },
+  Cahetel:  { prayer: "Cahetel, abencoa esta colheita com tua generosidade infinita.", deepMsg: "Cahetel e o anjo da colheita abundante e das bencaos materiais. Sua energia conecta o esforco terreno com a recompensa divina. Os numeros que fluem sob Cahetel carregam a vibracao da prosperidade merecida e da gratidao cosmica." },
+  Haziel:   { prayer: "Haziel, derrama tua graca sobre minhas escolhas.", deepMsg: "Haziel e o anjo da graca, do perdao e da misericordia infinita. Sua energia dissolve resistencias e abre canais de recepcao que estavam bloqueados. Sob Haziel, os numeros fluem com naturalidade, como presentes de um universo generoso." },
+  Aladiah:  { prayer: "Aladiah, revela-me os misterios que conduzem a abundancia.", deepMsg: "Aladiah e o anjo dos misterios ocultos e da regeneracao espiritual. Ele atua nas camadas mais profundas da consciencia, trazendo a tona numeros que ressoam com verdades universais. Sua energia e de revelacao e despertar." },
+  Lauviah:  { prayer: "Lauviah, abre meus olhos interiores para as revelacoes da noite.", deepMsg: "Lauviah e o anjo das revelacoes noturnas e da sabedoria oculta. Seus numeros podem surgir em sonhos, intuicoes subitas ou lampadas de inspiracao. A conexao com Lauviah intensifica a percepcao extrassensorial e a receptividade aos sinais do universo." },
+  Hahaiah:  { prayer: "Hahaiah, concede-me a serenidade que atrai a fortuna.", deepMsg: "Hahaiah e o anjo do refugio interior e da paz profunda. Sua energia cria um espaco de calma onde a mente pode captar as frequencias mais sutis da sorte. Os numeros revelados sob Hahaiah emergem do silencio contemplativo, carregados de serenidade e certeza." },
+};
+
+function buildAngelMessage(angel, moon, lifeNum) {
+  var detail = ANGEL_DETAILS[angel.name] || {};
+  var msg = detail.deepMsg || angel.message;
+  msg += " Sob a " + moon.name + " (energia de " + moon.influence + "), a conexao com " + angel.name + " se intensifica, amplificando a virtude de " + angel.virtue + " em cada numero revelado.";
+  return { fullMessage: msg, prayer: detail.prayer || ("" + angel.name + ", guia meus numeros com tua luz.") };
+}
+
 function generateAnjos(birthDate, lotteryKey) {
   var lottery = LOTTERIES[lotteryKey];
   var minNum = lotteryKey === 'lotomania' ? 0 : 1;
@@ -419,7 +441,7 @@ function generateAnjos(birthDate, lotteryKey) {
     featureData: {
       angel: { name: angel.name, emoji: angel.emoji, virtue: angel.virtue, message: angel.message },
       angelicNumber: seqPick,
-    },
+      angelicNumber: seqPick, angelNarrative: buildAngelMessage(angel, moon, lifeNum),
   };
 }
 

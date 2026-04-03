@@ -338,6 +338,12 @@ function FeatureResultHeader({ result }) {
             Número angélico ativado: <strong style={{ color: '#60A5FA' }}>{fd.angelicNumber}</strong>
           </div>
         )}
+        {fd.angelNarrative && (
+          <div style={{ marginTop: 16, padding: "14px 18px", background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.12)", borderRadius: 10 }}>
+            <p style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.8, fontFamily: "'EB Garamond', serif", marginBottom: 10 }}>{fd.angelNarrative.fullMessage}</p>
+            <p style={{ fontSize: 12, color: "#60A5FA", fontStyle: "italic", textAlign: "center" }}>{fd.angelNarrative.prayer}</p>
+          </div>
+        )}
       </div>
     );
   }
