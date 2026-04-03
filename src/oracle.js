@@ -318,6 +318,39 @@ function generateTarot(birthDate, lotteryKey) {
 // ══════════════════════════════════════
 //  ALGORITMO 2: NUMEROLOGIA
 // ══════════════════════════════════════
+var LIFE_NUMBER_DETAILS = {
+  1: { essence: "Lider nato e pioneiro", insight: "O numero 1 vibra com a energia da criacao original. Voce possui uma forca interior que atrai numeros de inicio e conquista. Sua independencia e determinacao se refletem em combinacoes ousadas e inovadoras." },
+  2: { essence: "Diplomata e intuitivo", insight: "O numero 2 pulsa com sensibilidade e cooperacao. Sua intuicao refinada capta frequencias sutis que outros nao percebem. Os numeros que emergem da sua vibracao buscam harmonia e equilibrio perfeito." },
+  3: { essence: "Criativo e expressivo", insight: "O numero 3 irradia alegria e criatividade cosmica. Sua energia expansiva atrai combinacoes vibrantes e otimistas. A comunicacao com o universo flui naturalmente atraves da sua expressao artistica." },
+  4: { essence: "Construtor e estavel", insight: "O numero 4 representa a base solida sobre a qual a sorte se constroi. Sua disciplina e persistencia criam um campo energetico que favorece resultados consistentes e confiaveis." },
+  5: { essence: "Aventureiro e livre", insight: "O numero 5 vibra com mudanca e liberdade. Sua energia dinamica atrai o inesperado e o surpreendente. Os numeros que ressoam com voce carregam a vibracao da aventura e das oportunidades imprevistas." },
+  6: { essence: "Harmonizador e protetor", insight: "O numero 6 emana amor e responsabilidade. Sua vibracao cria um campo de protecao que atrai numeros equilibrados e harmoniosos. A energia do lar e da familia fortalece suas escolhas." },
+  7: { essence: "Mistico e analitico", insight: "O numero 7 e o mais espiritual de todos. Sua conexao com o invisivel e profunda e natural. Os numeros que emergem carregam sabedoria ancestral e a forca da contemplacao mistica." },
+  8: { essence: "Poderoso e abundante", insight: "O numero 8 vibra com poder material e realizacao. O simbolo do infinito em sua essencia indica ciclos de abundancia sem fim. Seus numeros carregam a energia da prosperidade concreta." },
+  9: { essence: "Humanitario e sabio", insight: "O numero 9 encerra todos os outros em si, representando completude e sabedoria universal. Sua vibracao altruista atrai numeros carregados de proposito e significado cosmico." },
+  11: { essence: "Mestre intuitivo", insight: "O numero mestre 11 possui uma antena cosmica amplificada. Sua intuicao e quase profetica, captando sinais que transcendem o racional. Os numeros revelados vibram numa frequencia espiritual elevada." },
+  22: { essence: "Mestre construtor", insight: "O numero mestre 22 combina visao espiritual com poder de manifestacao material. Voce pode transformar sonhos em realidade. Os numeros que emergem carregam um potencial extraordinario de concretizacao." },
+  33: { essence: "Mestre curador", insight: "O numero mestre 33 e o mais raro e poderoso. Sua vibracao de compaixao cosmica atrai numeros imbuidos de graca divina e proposito transcendente." },
+};
+
+function buildNumeroInterpretation(lifeNum, nameNum, dayVib, persYear) {
+  var detail = LIFE_NUMBER_DETAILS[lifeNum] || LIFE_NUMBER_DETAILS[lifeNum > 9 ? 9 : lifeNum] || {};
+  var intro = detail.insight || "Sua vibracao numerologica e unica.";
+  var analysis = " A Vibracao do Nome (" + nameNum + ") reforca ";
+  if (nameNum <= 3) analysis += "sua capacidade criativa e comunicativa. ";
+  else if (nameNum <= 6) analysis += "sua estabilidade e senso de responsabilidade. ";
+  else analysis += "sua profundidade analitica e espiritual. ";
+  analysis += "No Ano Pessoal " + persYear + ", ";
+  if (persYear <= 3) analysis += "voce esta num ciclo de novos comecos e expansao. ";
+  else if (persYear <= 6) analysis += "voce esta num ciclo de construcao e consolidacao. ";
+  else analysis += "voce esta num ciclo de colheita e reflexao profunda. ";
+  analysis += "A Vibracao do Dia (" + dayVib + ") adiciona uma camada de energia ";
+  if (dayVib <= 3) analysis += "criativa e expansiva ao momento.";
+  else if (dayVib <= 6) analysis += "estavel e protetora ao momento.";
+  else analysis += "mistica e contemplativa ao momento.";
+  return { essence: detail.essence || "Vibracao unica", fullInsight: intro + analysis };
+}
+
 function generateNumerologia(birthDate, lotteryKey, fullName) {
   var lottery = LOTTERIES[lotteryKey];
   var minNum = lotteryKey === 'lotomania' ? 0 : 1;
@@ -348,7 +381,7 @@ function generateNumerologia(birthDate, lotteryKey, fullName) {
     pressupostos: buildPressupostos(numbers, minNum, maxNum),
     featureData: {
       lifeNumber: lifeNum, nameNumber: nameNum, dayVibration: dayVib, personalYear: persYear,
-      interpretation: 'Número de Vida ' + lifeNum + ', Vibração do Nome ' + nameNum + ', Ano Pessoal ' + persYear + ' e Vibração do Dia ' + dayVib + ' criaram uma frequência única.',
+      interpretation: buildNumeroInterpretation(lifeNum, nameNum, dayVib, persYear),
     },
   };
 }

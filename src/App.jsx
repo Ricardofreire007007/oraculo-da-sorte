@@ -310,7 +310,10 @@ function FeatureResultHeader({ result }) {
             );
           })}
         </div>
-        <p style={{ fontSize: 13, color: COLORS.textMuted, textAlign: 'center', marginTop: 12, lineHeight: 1.6, fontStyle: 'italic' }}>{fd.interpretation}</p>
+        <div style={{ textAlign: "center", marginTop: 12 }}>
+          {fd.interpretation && fd.interpretation.essence && <p style={{ fontFamily: "'Cinzel', serif", fontSize: 13, color: COLORS.gold, marginBottom: 8 }}>{fd.interpretation.essence}</p>}
+          <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.8, fontStyle: "italic", fontFamily: "'EB Garamond', serif" }}>{fd.interpretation.fullInsight || fd.interpretation}</p>
+        </div>
       </div>
     );
   }
