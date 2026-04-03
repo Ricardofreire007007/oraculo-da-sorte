@@ -441,7 +441,8 @@ function generateAnjos(birthDate, lotteryKey) {
     featureData: {
       angel: { name: angel.name, emoji: angel.emoji, virtue: angel.virtue, message: angel.message },
       angelicNumber: seqPick,
-      angelicNumber: seqPick, angelNarrative: buildAngelMessage(angel, moon, lifeNum),
+      angelNarrative: buildAngelMessage(angel, moon, lifeNum),
+    },
   };
 }
 
