@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { generateMysticNumbers, getMoonPhase, LOTTERIES, FEATURES } from './oracle.js';
+import { track } from '@vercel/analytics';
 
 const COLORS = {
   bg: "#0a0612", gold: "#c9a84c", goldLight: "#e8c97a", amber: "#d4813a",
@@ -150,6 +151,7 @@ function PlanPopup({ onClose, feature }) {
   ];
 
   var handleCheckout = function(plan) {
+    track('oraculo_checkout_started', { plan: plan });
     fetch('/api/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -555,6 +557,10 @@ export default function App() {
     if (premium) {
       startGeneration(lottery);
     } else {
+      track('oraculo_plan_popup_opened', {
+        lottery: lottery,
+        feature: selectedFeature
+      });
       setShowPlanPopup(true);
     }
   };
@@ -572,6 +578,11 @@ export default function App() {
         { fullName: profile.full_name, location: profile.location }
       );
       setResult(oracleResult);
+      track('oraculo_consultation_completed', {
+        lottery: lotteryKey,
+        feature: selectedFeature,
+        plan: (profile && profile.plano) || 'free'
+      });
       setStep('result');
     }, 2500);
   };
