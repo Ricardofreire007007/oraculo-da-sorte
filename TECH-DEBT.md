@@ -29,3 +29,21 @@ Vite reporta chunk principal > 500 kB (1144 kB sem gzip, 312 kB com gzip). Resol
 ## Cliente Supabase órfão removido (resolvido)
 
 ✓ Removido o cliente Supabase morto do Landing.jsx (commit a75f6cb)
+
+## Código morto e ficheiros órfãos
+
+### `src/pages/Pricing.jsx` — página órfã
+
+Página de pricing standalone registada como rota `/pricing` em `main.jsx`, mas sem qualquer entry point no UI vivo. Zero `href="/pricing"`, zero `navigate("/pricing")` no código. Só acessível por URL directa.
+
+Contém:
+- 4 erros de lint pré-existentes (react-hooks/immutability, unused vars)
+- Variável `result` morta (linha 499)
+- `window.location.href = '/app'` redundante após `return`
+- Função `handleCheckout` duplicada (existe versão funcional em `App.jsx` PlanPopup e em `Landing.jsx`)
+
+Decisão a tomar numa sessão futura: ou (a) reactivar e instrumentar, ou (b) apagar o ficheiro e remover a rota do `main.jsx`. Por agora, fica intocado.
+
+### `src/App.jsx.txt` — backup esquecido
+
+Ficheiro de backup em texto puro do `App.jsx` que não é bundlado mas está versionado no Git público. Considerar apagar do repo ou mover para `.gitignore`.
