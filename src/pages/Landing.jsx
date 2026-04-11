@@ -1,9 +1,4 @@
-﻿import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../AuthContext.jsx";
 import OnboardingPopup from "../OnboardingPopup.jsx";
 
@@ -290,12 +285,18 @@ const styles = `
 
 // ── Stars ─────────────────────────────────────────────────────────
 function Stars() {
-  const stars = Array.from({ length: 80 }, (_, i) => ({
-    id: i, x: Math.random() * 100, y: Math.random() * 100,
-    size: Math.random() * 2.5 + 0.5,
-    duration: (Math.random() * 3 + 2).toFixed(1),
-    delay: (Math.random() * 4).toFixed(1),
-  }));
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 80 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 2.5 + 0.5,
+        duration: (Math.random() * 3 + 2).toFixed(1),
+        delay: (Math.random() * 4).toFixed(1),
+      })),
+    []
+  );
   return (
     <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }}>
       {stars.map((s) => <div key={s.id} className="star" style={{ left: `${s.x}%`, top: `${s.y}%`, width: s.size, height: s.size, "--duration": `${s.duration}s`, "--delay": `${s.delay}s` }} />)}
@@ -415,7 +416,7 @@ function MysticPaths() {
             </div>
 
             {/* 5 ORBITING SVG SATELLITES */}
-            {paths.map(function(path, i) {
+            {paths.map(function(path) {
               var SvgComp = SVG_COMPONENTS[path.key];
               return (
                 <a key={path.key} href="/app" className="orbit-sat"
@@ -630,7 +631,7 @@ function Footer() {
 // ── App ───────────────────────────────────────────────────────────
 export default function App() {
   var [activeSection, setActiveSection] = useState("Início");
-  var { user, profile, loading, showOnboarding, login, logout, completeOnboarding } = useAuth();
+  var { user, showOnboarding, login, logout, completeOnboarding } = useAuth();
   return (
     <>
       <style>{styles}</style>
