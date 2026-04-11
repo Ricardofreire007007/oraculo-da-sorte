@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Oráculo da Sorte</title>
+  <desc>Estrela mística dourada com gema central, sobre fundo escuro. Ícone do Oráculo da Sorte.</desc>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1024" height="1024" fill="#0a0612"/>
+
+  <!-- Subtle background star particles for depth (very faint, only visible at large sizes) -->
+  <circle cx="180" cy="220" r="3" fill="#c9a84c" opacity="0.25"/>
+  <circle cx="850" cy="200" r="2.5" fill="#e8c97a" opacity="0.3"/>
+  <circle cx="880" cy="820" r="3" fill="#c9a84c" opacity="0.25"/>
+  <circle cx="160" cy="840" r="2.5" fill="#e8c97a" opacity="0.3"/>
+  <circle cx="500" cy="120" r="2" fill="#ffffff" opacity="0.2"/>
+  <circle cx="900" cy="500" r="2" fill="#ffffff" opacity="0.2"/>
+  <circle cx="510" cy="920" r="2" fill="#ffffff" opacity="0.2"/>
+  <circle cx="120" cy="510" r="2" fill="#ffffff" opacity="0.2"/>
+
+  <!-- Main star shape (mystic 4-point star with diamond inner cuts) -->
+  <path d="M 512 132 L 602 422 L 892 512 L 602 602 L 512 892 L 422 602 L 132 512 L 422 422 Z" fill="#c9a84c"/>
+
+  <!-- Star edge accent (subtle lighter outline) -->
+  <path d="M 512 132 L 602 422 L 892 512 L 602 602 L 512 892 L 422 602 L 132 512 L 422 422 Z" fill="none" stroke="#e8c97a" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Central gem dark cutout (creates the gem socket) -->
+  <circle cx="512" cy="512" r="58" fill="#0a0612"/>
+
+  <!-- Central gem highlight ring -->
+  <circle cx="512" cy="512" r="58" fill="none" stroke="#8a7230" stroke-width="2"/>
+
+  <!-- Central gem bright dot -->
+  <circle cx="512" cy="512" r="30" fill="#e8c97a"/>
+
+  <!-- Tiny gem highlight (top-left) for jewel effect -->
+  <ellipse cx="503" cy="502" rx="9" ry="6" fill="#ffffff" opacity="0.5"/>
+</svg>
