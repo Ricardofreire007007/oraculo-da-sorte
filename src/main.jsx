@@ -8,6 +8,8 @@ import Landing from './pages/Landing.jsx';
 import Pricing from './pages/Pricing.jsx';
 import { AuthProvider } from './AuthContext.jsx';
 import { initRevenueCat, getOfferings } from './revenuecat.js';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 initRevenueCat().then(async () => {
   await getOfferings();
@@ -21,6 +23,8 @@ initRevenueCat().then(async () => {
             <Route path="/app" element={<App />} />
             <Route path="/pricing" element={<Pricing />} />
           </Routes>
+          <Analytics />
+          <SpeedInsights />
         </BrowserRouter>
       </AuthProvider>
     </StrictMode>
