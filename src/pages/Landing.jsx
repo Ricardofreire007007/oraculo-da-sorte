@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../AuthContext.jsx";
 import OnboardingPopup from "../OnboardingPopup.jsx";
+import { track } from "@vercel/analytics";
 
 const COLORS = {
   bg: "#0a0612", bgCard: "#110d1e",
@@ -322,7 +323,7 @@ function Navbar({ activeSection, setActiveSection, user, login, logout }) {
         {user ? (
           <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={logout}>Sair</button>
         ) : (
-          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={login}>Entrar com Google</button>
+          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={() => { track('oraculo_login_clicked'); login(); }}>Entrar com Google</button>
         )}
       </div>
     </nav>
@@ -500,6 +501,7 @@ function HowItWorks() {
 
 // ── Planos ─────────────────────────────────────────────────────────
 async function handleCheckout(plan) {
+  track('oraculo_checkout_started', { plan: plan });
   var res = await fetch('/api/create-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }) });
   var data = await res.json();
   if (data.url) window.location.href = data.url;
