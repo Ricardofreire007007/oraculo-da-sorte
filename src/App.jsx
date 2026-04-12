@@ -108,10 +108,17 @@ async function registarConsumo(profile, consumo) {
       if (error) console.error('Erro ao debitar crédito:', error);
     } else if (consumo === 'trial_diario') {
       console.log('[DEBUG] vai fazer UPDATE ultima_consulta_megasena para id:', profile.id);
+      var { data: authData } = await supabase.auth.getUser();
+      console.log('[DEBUG] auth.getUser no momento do UPDATE:', {
+        authUser_id: authData.user?.id,
+        profile_id: profile.id,
+        matches: authData.user?.id === profile.id
+      });
       var { data: resultado, error: trialError } = await supabase
         .from('profiles')
         .update({ ultima_consulta_megasena: new Date().toISOString() })
-        .eq('id', profile.id);
+        .eq('id', profile.id)
+        .select();
       console.log('[DEBUG] resultado do UPDATE:', { error: trialError, data: resultado });
       if (trialError) console.error('Erro ao registar consulta trial:', trialError);
     }
