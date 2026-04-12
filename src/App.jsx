@@ -98,6 +98,7 @@ function temAcesso(profile, lotteryKey) {
 // Chamado por handleLotterySelect depois de temAcesso retornar permitido: true.
 async function registarConsumo(profile, consumo) {
   if (consumo === 'nenhum') return;
+  console.log('[DEBUG] registarConsumo chamado:', { consumo: consumo, profile_id: profile && profile.id });
   try {
     if (consumo === 'credito') {
       var { error } = await supabase
@@ -106,10 +107,12 @@ async function registarConsumo(profile, consumo) {
         .eq('id', profile.id);
       if (error) console.error('Erro ao debitar crédito:', error);
     } else if (consumo === 'trial_diario') {
-      var { error: trialError } = await supabase
+      console.log('[DEBUG] vai fazer UPDATE ultima_consulta_megasena para id:', profile.id);
+      var { data: resultado, error: trialError } = await supabase
         .from('profiles')
         .update({ ultima_consulta_megasena: new Date().toISOString() })
         .eq('id', profile.id);
+      console.log('[DEBUG] resultado do UPDATE:', { error: trialError, data: resultado });
       if (trialError) console.error('Erro ao registar consulta trial:', trialError);
     }
   } catch (err) {
@@ -661,7 +664,9 @@ export default function App() {
 
   var handleLotterySelect = function(lottery) {
     setSelectedLottery(lottery);
+    console.log('[DEBUG] handleLotterySelect chamado:', { lottery: lottery, profile_id: profile && profile.id, profile_plano: profile && profile.plano, profile_created_at: profile && profile.created_at });
     var acesso = temAcesso(profile, lottery);
+    console.log('[DEBUG] temAcesso retornou:', acesso);
     if (!acesso.permitido) {
       track('oraculo_plan_popup_opened', {
         lottery: lottery,
