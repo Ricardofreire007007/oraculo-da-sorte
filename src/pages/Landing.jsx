@@ -536,7 +536,7 @@ function Pricing() {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 40, padding: "24px 32px", background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, textAlign: "center" }}>
+        <div onClick={() => window.location.href = "/app"} style={{ marginTop: 40, padding: "24px 32px", background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: 12, textAlign: "center", cursor: "pointer", transition: "background 0.2s ease" }} onMouseEnter={(e) => e.currentTarget.style.background = "rgba(201,168,76,0.12)"} onMouseLeave={(e) => e.currentTarget.style.background = "rgba(201,168,76,0.05)"}>
           <span className="cinzel" style={{ color: COLORS.gold, fontSize: 14 }}>✨ Quer só experimentar?</span>
           <span style={{ color: COLORS.textMuted, fontSize: 15, marginLeft: 12 }}>Comece grátis com 1 consulta diária na Mega-Sena — <strong style={{ color: COLORS.text }}>sem cartão</strong>.</span>
         </div>

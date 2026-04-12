@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { generateMysticNumbers, getMoonPhase, LOTTERIES, FEATURES } from './oracle.js';
+import { supabase } from './auth.js';
 import { track } from '@vercel/analytics';
 
 const COLORS = {
@@ -20,6 +21,100 @@ function getPlanLabel(profile) {
   if (profile.plano === 'sagrado') return { label: 'Plano Sagrado', color: COLORS.amber, bg: 'rgba(212,129,58,0.15)', border: 'rgba(212,129,58,0.3)' };
   if (profile.plano === 'paid') return { label: 'Plano Premium', color: COLORS.gold, bg: 'rgba(201,168,76,0.15)', border: 'rgba(201,168,76,0.3)' };
   return { label: 'Plano Livre', color: COLORS.textMuted, bg: 'rgba(168,152,128,0.15)', border: 'rgba(168,152,128,0.3)' };
+}
+
+// Duração do período de trial gratuito (dias)
+const TRIAL_DURATION_DAYS = 30;
+
+// Formatter reutilizável para converter timestamps para data em São Paulo.
+// Criado uma vez ao nível do módulo porque new Intl.DateTimeFormat() é caro.
+const SAO_PAULO_FORMATTER = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: 'America/Sao_Paulo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+// Verifica se o utilizador ainda está no período de trial (30 dias após registo).
+// Edge case: se profile.created_at for undefined (acontece imediatamente após o
+// onboarding porque completeOnboarding() em AuthContext.jsx constrói um profile
+// parcial sem created_at), assumimos que é utilizador acabado de criar → em trial.
+function isInTrialPeriod(profile) {
+  if (!profile) return false;
+  if (!profile.created_at) return true;
+  var now = new Date();
+  var created = new Date(profile.created_at);
+  var diffMs = now.getTime() - created.getTime();
+  var diffDays = diffMs / (1000 * 60 * 60 * 24);
+  return diffDays < TRIAL_DURATION_DAYS;
+}
+
+// Verifica se o utilizador já usou a consulta grátis da Mega-Sena hoje.
+// Compara a data actual com a data da última consulta, ambas no fuso de São Paulo
+// (America/Sao_Paulo), porque o mercado é 100% brasileiro e o reset diário deve
+// acontecer à meia-noite no horário local dos utilizadores.
+// Usa Intl.DateTimeFormat para extrair YYYY-MM-DD em São Paulo sem dependências
+// externas. A comparação de strings funciona porque o formato YYYY-MM-DD é
+// lexicograficamente ordenável (ano-mês-dia, sempre com zero-padding).
+function usouMegasenaHoje(profile) {
+  if (!profile) return false;
+  if (!profile.ultima_consulta_megasena) return false;
+  var partes = function(date) {
+    var p = SAO_PAULO_FORMATTER.formatToParts(date);
+    var yEntry = p.find(function(x) { return x.type === 'year'; });
+    var mEntry = p.find(function(x) { return x.type === 'month'; });
+    var dEntry = p.find(function(x) { return x.type === 'day'; });
+    if (!yEntry || !mEntry || !dEntry) return null;
+    return yEntry.value + '-' + mEntry.value + '-' + dEntry.value;
+  };
+  var hoje = partes(new Date());
+  var ultima = partes(new Date(profile.ultima_consulta_megasena));
+  if (!hoje || !ultima) return false;
+  return hoje === ultima;
+}
+
+// Determina se o utilizador tem acesso a gerar números para uma loteria.
+// Retorna { permitido, motivo, consumo } para que handleLotterySelect saiba
+// o que fazer e registarConsumo saiba o que debitar.
+//
+// Cenários (por ordem de prioridade):
+//   1. Sem profile → sem_login (não devia acontecer, safety net)
+//   2. Plano premium (mistico/sagrado/paid) → acesso total, sem consumo
+//   3. Créditos avulsos disponíveis → acesso, consome 1 crédito
+//   4. Mega-Sena em trial (< 30 dias) e ainda não usou hoje → acesso, consome trial diário
+//   5. Nenhum dos anteriores → paywall
+function temAcesso(profile, lotteryKey) {
+  if (!profile) return { permitido: false, motivo: 'sem_login', consumo: 'nenhum' };
+  if (isPremiumUser(profile)) return { permitido: true, motivo: 'premium', consumo: 'nenhum' };
+  if (profile.creditos_restantes > 0) return { permitido: true, motivo: 'credito', consumo: 'credito' };
+  if (lotteryKey === 'megasena' && isInTrialPeriod(profile) && !usouMegasenaHoje(profile)) {
+    return { permitido: true, motivo: 'trial_diario', consumo: 'trial_diario' };
+  }
+  return { permitido: false, motivo: 'paywall', consumo: 'nenhum' };
+}
+
+// Regista o consumo de uma consulta na BD (crédito ou trial diário).
+// Não bloqueia a UI se falhar — loga o erro e continua.
+// Chamado por handleLotterySelect depois de temAcesso retornar permitido: true.
+async function registarConsumo(profile, consumo) {
+  if (consumo === 'nenhum') return;
+  try {
+    if (consumo === 'credito') {
+      var { error } = await supabase
+        .from('profiles')
+        .update({ creditos_restantes: profile.creditos_restantes - 1 })
+        .eq('id', profile.id);
+      if (error) console.error('Erro ao debitar crédito:', error);
+    } else if (consumo === 'trial_diario') {
+      var { error: trialError } = await supabase
+        .from('profiles')
+        .update({ ultima_consulta_megasena: new Date().toISOString() })
+        .eq('id', profile.id);
+      if (trialError) console.error('Erro ao registar consulta trial:', trialError);
+    }
+  } catch (err) {
+    console.error('Erro inesperado em registarConsumo:', err);
+  }
 }
 
 // ══════════════════════════════════════
@@ -76,7 +171,7 @@ function FeatureSelection({ onSelect }) {
 // ══════════════════════════════════════
 //  ETAPA 2: SELEÇÃO DE LOTERIA
 // ══════════════════════════════════════
-function LotterySelection({ feature, onSelect, onBack, isPremium }) {
+function LotterySelection({ feature, onSelect, onBack, isPremium, profile }) {
   var lotteryKeys = Object.keys(LOTTERIES);
   var featureData = FEATURES[feature];
 
@@ -100,6 +195,18 @@ function LotterySelection({ feature, onSelect, onBack, isPremium }) {
           Agora escolha para qual loteria deseja gerar os números
         </p>
       </div>
+
+      {(function() {
+        if (isPremium) return false;
+        var acessoMega = temAcesso(profile, 'megasena');
+        if (acessoMega.permitido && acessoMega.motivo === 'trial_diario') return (
+          <div style={{ textAlign: 'center', fontSize: 14, color: COLORS.gold, marginBottom: 24, fontStyle: 'italic' }}>✨ Tens 1 consulta grátis hoje na Mega-Sena</div>
+        );
+        if (acessoMega.permitido && acessoMega.motivo === 'credito') return (
+          <div style={{ textAlign: 'center', fontSize: 14, color: COLORS.gold, marginBottom: 24, fontStyle: 'italic' }}>{profile.creditos_restantes} crédito{profile.creditos_restantes !== 1 ? 's' : ''} disponíve{profile.creditos_restantes !== 1 ? 'is' : 'l'}</div>
+        );
+        return false;
+      })()}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
         {lotteryKeys.map(function(key) {
@@ -554,15 +661,20 @@ export default function App() {
 
   var handleLotterySelect = function(lottery) {
     setSelectedLottery(lottery);
-    if (premium) {
-      startGeneration(lottery);
-    } else {
+    var acesso = temAcesso(profile, lottery);
+    if (!acesso.permitido) {
       track('oraculo_plan_popup_opened', {
         lottery: lottery,
         feature: selectedFeature
       });
       setShowPlanPopup(true);
+      return;
     }
+    startGeneration(lottery);
+    // Registar consumo e actualizar profile em background (fire-and-forget)
+    registarConsumo(profile, acesso.consumo).then(function() {
+      if (refreshProfile) refreshProfile();
+    });
   };
 
   var startGeneration = function(lottery) {
@@ -663,6 +775,19 @@ export default function App() {
             borderRadius: 20, padding: '3px 10px', fontSize: 11, color: planInfo.color,
             fontFamily: "'Cinzel', serif",
           }}>{planInfo.label}</span>
+          {(function() {
+            if (isPremiumUser(profile)) return false;
+            if (profile && profile.creditos_restantes > 0) return (
+              <span style={{ background: 'rgba(201,168,76,0.15)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 20, padding: '2px 8px', fontSize: 10, color: COLORS.gold, fontFamily: "'Cinzel', serif" }}>{profile.creditos_restantes} crédito{profile.creditos_restantes !== 1 ? 's' : ''}</span>
+            );
+            if (profile && isInTrialPeriod(profile) && !usouMegasenaHoje(profile)) return (
+              <span style={{ background: 'rgba(201,168,76,0.15)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 20, padding: '2px 8px', fontSize: 10, color: COLORS.gold, fontFamily: "'Cinzel', serif" }}>1 grátis hoje</span>
+            );
+            if (profile && isInTrialPeriod(profile) && usouMegasenaHoje(profile)) return (
+              <span style={{ background: 'rgba(168,152,128,0.15)', border: '1px solid rgba(168,152,128,0.3)', borderRadius: 20, padding: '2px 8px', fontSize: 10, color: COLORS.textMuted, fontFamily: "'Cinzel', serif" }}>Próxima grátis amanhã</span>
+            );
+            return false;
+          })()}
         </div>
       </div>
 
@@ -693,6 +818,7 @@ export default function App() {
             onSelect={handleLotterySelect}
             onBack={handleBackToStart}
             isPremium={premium}
+            profile={profile}
           />
         )}
 

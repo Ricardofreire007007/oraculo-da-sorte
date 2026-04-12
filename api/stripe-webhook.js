@@ -37,14 +37,33 @@ export default async function handler(req, res) {
     const plan = session.metadata?.plan || (session.mode === 'subscription' ? 'paid' : 'consulta');
 
     if (customerEmail) {
+      // Para plano consulta, acumular 3 créditos ao saldo existente
+      let updateData = {
+        plano: plan,
+        stripe_customer_id: session.customer,
+        subscription_id: session.subscription || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (plan === 'consulta') {
+        let creditosActuais = 0;
+        try {
+          const { data: currentProfile } = await supabase
+            .from('profiles')
+            .select('creditos_restantes')
+            .eq('email', customerEmail)
+            .single();
+          creditosActuais = currentProfile?.creditos_restantes || 0;
+        } catch (err) {
+          console.error('Erro ao ler créditos actuais, usando 0:', err);
+        }
+        updateData.creditos_restantes = creditosActuais + 3;
+        console.log('Plano consulta: creditos_restantes', creditosActuais, '->', creditosActuais + 3, 'para', customerEmail);
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          plano: plan,
-          stripe_customer_id: session.customer,
-          subscription_id: session.subscription || null,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('email', customerEmail);
 
       if (error) console.error('Supabase update error:', error);
