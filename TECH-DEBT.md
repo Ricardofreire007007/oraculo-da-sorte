@@ -47,3 +47,15 @@ Decisão a tomar numa sessão futura: ou (a) reactivar e instrumentar, ou (b) ap
 ### `src/App.jsx.txt` — backup esquecido
 
 Ficheiro de backup em texto puro do `App.jsx` que não é bundlado mas está versionado no Git público. Considerar apagar do repo ou mover para `.gitignore`.
+
+## Wake up Supabase session (workaround)
+
+Padrão actual de chamar `await supabase.auth.getUser()` antes de UPDATEs em `registarConsumo` (`App.jsx`) é workaround para um bug onde o client anon falha silenciosamente (retorna `data: null`, `error: null`). Investigar causa raiz na próxima auditoria: pode ser configuração do client (`autoRefreshToken`, `persistSession`) ou bug conhecido do `supabase-js`. Se for causa raiz documentada, criar issue.
+
+## Banner de comunidade real
+
+O banner antigo (commit `f0f33de`, removido em `717c07c`) usava números hardcoded (`247 wins`, `R$ 184.930`). Nunca houve cruzamento real com sorteios. Implementação real requer:
+- Tabela `lottery_results` (resultados oficiais das loterias)
+- Tabela `generated_numbers` (registo de cada consulta gerada — actualmente não existe, geração é 100% client-side)
+- Lógica de cruzamento + endpoint `/api/stats` + componente `Banner.jsx` + job recorrente
+- Estimativa: 4-8h de trabalho

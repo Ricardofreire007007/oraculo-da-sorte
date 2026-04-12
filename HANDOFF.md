@@ -279,6 +279,18 @@ Os agentes podem **LER** estes ficheiros para entender comportamento, mas não m
 9. 3 diagramas criados pelo Claude (linear, funil de monetização, completo com ramos) — não estão no repo, são visuais inline da conversa
 10. `HANDOFF.md` trazido manualmente do Downloads para a raiz do repo (não estava versionado)
 
+### Sessão de 12 abril 2026 (tarde)
+
+1. Implementação completa de paywall com trial diário e créditos consumíveis
+2. Schema BD: adicionadas 2 colunas em profiles (`creditos_restantes` integer, `ultima_consulta_megasena` timestamptz)
+3. `App.jsx`: 2 helpers puros (`isInTrialPeriod`, `usouMegasenaHoje`) + função `temAcesso` (5 cenários) + `registarConsumo` + modificação de `handleLotterySelect`
+4. Webhook Stripe: agora credita +3 ao `creditos_restantes` quando plano `consulta` é comprado (acumula com saldo existente)
+5. `Landing.jsx`: botão "Comece grátis" tornado clicável (`window.location.href = "/app"`)
+6. UI feedback: badge no header (X créditos / 1 grátis hoje / próxima grátis amanhã) + mensagem dourada no `LotterySelection`
+7. Investigação: confirmado que banner de comunidade antigo (commits `f0f33de`, `5b86531`, `4996e74`) usava números hardcoded — nunca houve cruzamento real com sorteios
+8. Bug encontrado e resolvido: UPDATE via supabase client anon falhava silenciosamente (`data: null`). Fix: `await supabase.auth.getUser()` antes de cada UPDATE para "acordar" a sessão. Padrão importante para futuro.
+9. Commits: `24f03d1` (paywall), `160b555` (debug), `4327bba` (debug+select), `f1a70e8` (cleanup), `d5e3cb6` (wake up session)
+
 ---
 
 ## 13. Próximos passos possíveis (Ricardo decide)
@@ -306,6 +318,14 @@ Os agentes podem **LER** estes ficheiros para entender comportamento, mas não m
 - 4 vulnerabilidades npm
 - Desativar Client Secret antigo (`18Gn`) no Google Cloud Console depois de 24-48h de estabilidade do `dOeX`
 - Decidir destino do Pricing.jsx órfão e do App.jsx.txt
+
+### Caminho F — Stripe test → live
+- Migrar do modo de teste para produção (sessão dedicada de 1-2h)
+- Requer: Termos de Serviço, Política de Privacidade, validação SRF do CPF
+
+### Caminho G — Banner de comunidade real
+- Cruzamento de números gerados com resultados oficiais dos sorteios
+- Só vale a pena depois de >50 utilizadores reais
 
 ### Caminho E — Novas features
 - Depende dos dados que vierem do Caminho A
