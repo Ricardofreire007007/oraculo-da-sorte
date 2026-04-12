@@ -100,12 +100,16 @@ async function registarConsumo(profile, consumo) {
   if (consumo === 'nenhum') return;
   try {
     if (consumo === 'credito') {
+      // Wake up da sessão Supabase — sem isto o UPDATE pode falhar silenciosamente
+      await supabase.auth.getUser();
       var { error } = await supabase
         .from('profiles')
         .update({ creditos_restantes: profile.creditos_restantes - 1 })
         .eq('id', profile.id);
       if (error) console.error('Erro ao debitar crédito:', error);
     } else if (consumo === 'trial_diario') {
+      // Wake up da sessão Supabase — sem isto o UPDATE pode falhar silenciosamente
+      await supabase.auth.getUser();
       var { data: resultado, error: trialError } = await supabase
         .from('profiles')
         .update({ ultima_consulta_megasena: new Date().toISOString() })
