@@ -84,35 +84,66 @@ function PremiumModal({ onClose, user, onRedeemSuccess }) {
     setSubmitting(true);
     setError('');
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
       if (!token) {
         setError('Sessão expirada. Faz login novamente.');
-        setSubmitting(false);
         return;
       }
 
-      const res = await fetch('/api/redeem-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ code: code.trim().toUpperCase() }),
-      });
-      const data = await res.json().catch(() => ({}));
+      let res;
+      try {
+        res = await fetch('/api/redeem-code', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ code: code.trim().toUpperCase() }),
+          signal: controller.signal,
+        });
+      } catch (fetchErr) {
+        if (fetchErr.name === 'AbortError') {
+          setError('Tempo esgotado. Tenta novamente.');
+        } else {
+          console.error('Erro de rede ao resgatar código:', fetchErr);
+          setError('Erro de conexão. Tente novamente.');
+        }
+        return;
+      }
 
-      if (!res.ok || !data.success) {
-        setError(data.error || 'Os astros não reconhecem esse código. Verifique e tente novamente.');
-        setSubmitting(false);
+      // Ler body como texto primeiro — aguenta respostas vazias sem crashar.
+      let data = null;
+      try {
+        const text = await res.text();
+        data = text ? JSON.parse(text) : null;
+      } catch (parseErr) {
+        console.error('Resposta não-JSON do /api/redeem-code:', parseErr);
+      }
+
+      if (!res.ok) {
+        const msg = (data && data.error)
+          ? data.error
+          : `Erro ao validar código (HTTP ${res.status}). Tente novamente.`;
+        setError(msg);
+        return;
+      }
+
+      if (!data || !data.success) {
+        setError('Erro ao validar código. Tente novamente.');
         return;
       }
 
       onRedeemSuccess();
     } catch (err) {
-      console.error('Erro ao resgatar código:', err);
-      setError('Erro de conexão. Tente novamente.');
+      console.error('Erro inesperado ao resgatar código:', err);
+      setError('Erro inesperado. Tente novamente.');
+    } finally {
+      clearTimeout(timeoutId);
       setSubmitting(false);
     }
   };
