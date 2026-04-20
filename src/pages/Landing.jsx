@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../AuthContext.jsx";
+import { supabase } from "../auth.js";
 import OnboardingPopup from "../OnboardingPopup.jsx";
 import { track } from "@vercel/analytics";
 
@@ -500,39 +501,59 @@ function HowItWorks() {
 }
 
 // ── Planos ─────────────────────────────────────────────────────────
-async function handleCheckout(plan) {
-  track('oraculo_checkout_started', { plan: plan });
-  var res = await fetch('/api/create-checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan }) });
-  var data = await res.json();
-  if (data.url) window.location.href = data.url;
+async function handleCheckout(planoKey) {
+  track('oraculo_checkout_started', { plan: planoKey });
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      // Landing é público — se não autenticado, enviar para /app (trata do login)
+      window.location.href = '/app';
+      return;
+    }
+    const res = await fetch('/api/mp-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ plano: planoKey }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.init_point) {
+      console.error('Checkout falhou:', res.status, data);
+      alert('Falha ao iniciar pagamento. Tente novamente em instantes.');
+      return;
+    }
+    window.location.href = data.init_point;
+  } catch (err) {
+    console.error('Checkout error:', err);
+    alert('Erro ao iniciar pagamento. Tente novamente.');
+  }
 }
 
 function Pricing() {
-  var [billingTab, setBillingTab] = useState("mensal");
   var plans = [
-    { name: "3 Consultas", icon: "✧", price: { mensal: "R$6,00", anual: "R$6,00" }, period: "/ pacote", color: COLORS.textMuted, features: ["✓ 3 consultas completas", "✓ Todas as loterias brasileiras", "✓ Análise mística completa", "✓ Apenas R$2,00 por consulta"], cta: "Comprar Pacote", highlight: false },
-    { name: "Místico", icon: "🔮", price: { mensal: "R$9,90", anual: "R$7,90" }, period: billingTab === "anual" ? "/semana — anual" : "/semana", color: COLORS.gold, badge: "Mais Popular", features: ["✓ Todas as 7 loterias", "✓ Consultas ilimitadas", "✓ 5 caminhos místicos completos", "✓ Orixás + Anjos + Planetária", "✓ Análise de padrões históricos", "✗ Bolão espiritual"], cta: "Assinar Místico", highlight: true },
-    { name: "Sagrado", icon: "👑", price: { mensal: "R$24,90", anual: "R$19,90" }, period: billingTab === "anual" ? "/semana — anual" : "/semana", color: COLORS.amber, features: ["✓ Tudo do plano Místico", "✓ Bolão espiritual ilimitado", "✓ Consultor IA via chat", "✓ Relatório mensal", "✓ Badge de fundador", "✓ Suporte prioritário"], cta: "Assinar Sagrado", highlight: false },
+    { key: "consulta",      name: "Pacote 3 Consultas", icon: "🎯", price: "R$ 6,00",  period: "pacote avulso", color: COLORS.textMuted, features: ["✓ 3 consultas completas", "✓ Todas as loterias brasileiras", "✓ R$ 2,00 por consulta"], cta: "Comprar", highlight: false },
+    { key: "mistico",       name: "Místico",            icon: "🔮", price: "R$ 9,90",  period: "7 dias",        color: COLORS.gold,      features: ["✓ R$ 1,41 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: false },
+    { key: "sagrado",       name: "Sagrado",            icon: "👑", price: "R$ 24,90", period: "30 dias",       color: COLORS.amber,     features: ["✓ R$ 0,83 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: false },
+    { key: "premium_anual", name: "Premium Anual",      icon: "✦", price: "R$ 99,00", period: "365 dias",      color: COLORS.goldLight, badge: "Melhor Valor", features: ["✓ R$ 0,27 por dia", "✓ Um ano de acesso completo", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Melhor custo-benefício"], cta: "Comprar", highlight: true },
   ];
   return (
     <section id="planos" style={{ padding: "100px 32px", position: "relative", zIndex: 1 }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <p className="cinzel" style={{ textAlign: "center", color: COLORS.gold, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 12 }}>PLANOS</p>
         <h2 className="section-title" style={{ color: COLORS.text, marginBottom: 12 }}>Escolha seu <span className="gradient-text">caminho espiritual</span></h2>
-        <p style={{ textAlign: "center", color: COLORS.textMuted, fontSize: 17, marginBottom: 36, fontStyle: "italic" }}>Comece grátis. Evolua quando sentir a chamada.</p>
-        <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 56 }}>
-          {["mensal", "anual"].map((t) => <button key={t} className={`tab-btn ${billingTab === t ? "active" : ""}`} onClick={() => setBillingTab(t)}>{t === "mensal" ? "Mensal" : "Anual (−20%)"}</button>)}
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, alignItems: "start" }}>
+        <p style={{ textAlign: "center", color: COLORS.textMuted, fontSize: 17, marginBottom: 56, fontStyle: "italic" }}>Comece grátis. Evolua quando sentir a chamada.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, alignItems: "start" }}>
           {plans.map((plan) => (
-            <div key={plan.name} className="card-mystical" style={{ padding: 36, ...(plan.highlight ? { border: `2px solid ${COLORS.gold}`, boxShadow: "0 0 40px rgba(201,168,76,0.15)", transform: "scale(1.03)" } : {}) }}>
+            <div key={plan.key} className="card-mystical" style={{ padding: 36, ...(plan.highlight ? { border: `2px solid ${COLORS.goldLight}`, boxShadow: "0 0 40px rgba(232,201,122,0.18)", transform: "scale(1.03)" } : {}) }}>
               {plan.badge && <div style={{ background: `linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold})`, color: "#1a0f00", fontSize: 11, fontFamily: "'Cinzel', serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 14px", borderRadius: 20, display: "inline-block", marginBottom: 16 }}>{plan.badge}</div>}
               <div style={{ fontSize: 40, marginBottom: 12 }}>{plan.icon}</div>
               <h3 className="cinzel" style={{ fontSize: 20, color: plan.color, marginBottom: 8 }}>{plan.name}</h3>
-              <div style={{ marginBottom: 24 }}><span className="cinzel" style={{ fontSize: 42, fontWeight: 700, color: COLORS.text }}>{plan.price[billingTab]}</span><span style={{ fontSize: 14, color: COLORS.textMuted, marginLeft: 8 }}>{plan.period}</span></div>
+              <div style={{ marginBottom: 24 }}><span className="cinzel" style={{ fontSize: 42, fontWeight: 700, color: COLORS.text }}>{plan.price}</span><span style={{ fontSize: 14, color: COLORS.textMuted, marginLeft: 8 }}>{plan.period}</span></div>
               <div className="glow-line" style={{ marginBottom: 24 }} />
-              <ul style={{ listStyle: "none", marginBottom: 32 }}>{plan.features.map((f, i) => <li key={i} style={{ padding: "7px 0", fontSize: 14, color: f.startsWith("✗") ? COLORS.textMuted : COLORS.text, opacity: f.startsWith("✗") ? 0.5 : 1 }}>{f}</li>)}</ul>
-              <button className={plan.highlight ? "btn-primary" : "btn-outline"} style={{ width: "100%" }} onClick={() => plan.name === "Místico" ? handleCheckout("mistico") : plan.name === "Sagrado" ? handleCheckout("sagrado") : window.location.href = "/app"}>{plan.cta}</button>
+              <ul style={{ listStyle: "none", marginBottom: 32 }}>{plan.features.map((f, i) => <li key={i} style={{ padding: "7px 0", fontSize: 14, color: COLORS.text }}>{f}</li>)}</ul>
+              <button className={plan.highlight ? "btn-primary" : "btn-outline"} style={{ width: "100%" }} onClick={() => handleCheckout(plan.key)}>{plan.cta}</button>
             </div>
           ))}
         </div>
