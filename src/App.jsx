@@ -269,16 +269,11 @@ function PlanPopup({ onClose, feature }) {
   ];
 
   var handleCheckout = async function(planoKey) {
-    console.log('[MP] handleCheckout START', planoKey);
     try {
       track('oraculo_checkout_started', { plan: planoKey });
-      console.log('[MP] track() ok');
-    } catch (err) {
-      console.error('[MP] track() threw', err);
-    }
+    } catch {}
     let accessToken = null;
     try {
-      console.log('[MP] reading token from localStorage');
       let raw = null;
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -291,17 +286,12 @@ function PlanPopup({ onClose, feature }) {
         const parsed = JSON.parse(raw);
         accessToken = parsed?.access_token || parsed?.currentSession?.access_token || null;
       }
-      console.log('[MP] token from localStorage:', accessToken ? 'OK' : 'NOT FOUND');
-    } catch (err) {
-      console.error('[MP] localStorage read failed', err);
-    }
+    } catch {}
     if (!accessToken) {
-      console.error('[MP] no accessToken - aborting');
       alert('Sessão expirada. Por favor, faça login novamente.');
       return;
     }
     try {
-      console.log('[MP] calling fetch /api/mp-checkout');
       const res = await fetch('/api/mp-checkout', {
         method: 'POST',
         headers: {
@@ -310,18 +300,15 @@ function PlanPopup({ onClose, feature }) {
         },
         body: JSON.stringify({ plano: planoKey }),
       });
-      console.log('[MP] fetch returned', res.status);
       const data = await res.json();
-      console.log('[MP] response body:', data);
       if (!res.ok || !data.init_point) {
-        console.error('[MP] Checkout falhou:', res.status, data);
+        console.error('Checkout falhou:', res.status, data);
         alert('Falha ao iniciar pagamento. Tente novamente em instantes.');
         return;
       }
-      console.log('[MP] redirecting to', data.init_point);
       window.location.href = data.init_point;
     } catch (err) {
-      console.error('[MP] Checkout error caught:', err);
+      console.error('Checkout error:', err);
       alert('Erro ao iniciar pagamento. Tente novamente.');
     }
   };
