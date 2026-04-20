@@ -12,15 +12,20 @@ const COLORS = {
 
 function isPremiumUser(profile) {
   if (!profile || !profile.plano) return false;
-  return ['mistico', 'sagrado', 'paid'].includes(profile.plano);
+  const planosPremium = ['mistico', 'sagrado', 'premium_anual'];
+  if (!planosPremium.includes(profile.plano)) return false;
+  if (!profile.plano_expira_em) return false;
+  return new Date(profile.plano_expira_em) > new Date();
 }
 
 function getPlanLabel(profile) {
-  if (!profile || !profile.plano || profile.plano === 'free') return { label: 'Plano Livre', color: COLORS.textMuted, bg: 'rgba(168,152,128,0.15)', border: 'rgba(168,152,128,0.3)' };
+  const FREE = { label: 'Plano Livre', color: COLORS.textMuted, bg: 'rgba(168,152,128,0.15)', border: 'rgba(168,152,128,0.3)' };
+  if (!profile || !profile.plano || profile.plano === 'free') return FREE;
+  if (!isPremiumUser(profile)) return FREE;
   if (profile.plano === 'mistico') return { label: 'Plano Místico', color: COLORS.gold, bg: 'rgba(201,168,76,0.15)', border: 'rgba(201,168,76,0.3)' };
   if (profile.plano === 'sagrado') return { label: 'Plano Sagrado', color: COLORS.amber, bg: 'rgba(212,129,58,0.15)', border: 'rgba(212,129,58,0.3)' };
-  if (profile.plano === 'paid') return { label: 'Plano Premium', color: COLORS.gold, bg: 'rgba(201,168,76,0.15)', border: 'rgba(201,168,76,0.3)' };
-  return { label: 'Plano Livre', color: COLORS.textMuted, bg: 'rgba(168,152,128,0.15)', border: 'rgba(168,152,128,0.3)' };
+  if (profile.plano === 'premium_anual') return { label: 'Premium Anual', color: COLORS.goldLight, bg: 'rgba(232,201,122,0.15)', border: 'rgba(232,201,122,0.3)' };
+  return FREE;
 }
 
 // Duração do período de trial gratuito (dias)
@@ -257,21 +262,40 @@ function PlanPopup({ onClose, feature }) {
   var featureData = FEATURES[feature];
 
   var plans = [
-    { key: 'consulta', name: 'Pacote 3 Consultas', price: 'R$6,00', period: 'avulso', desc: '3 consultas completas · R$2 cada · Sem assinatura', icon: '🎯' },
-    { key: 'mistico',  name: 'Plano Místico',      price: 'R$9,99', period: '/semana', desc: 'Consultas ilimitadas · Todas as loterias · Todos os rituais', icon: '🔮', badge: 'Mais Popular' },
-    { key: 'sagrado',  name: 'Plano Sagrado',      price: 'R$29,99',period: '/mês',   desc: 'Tudo do Místico + Bolão espiritual + Consultor IA + Badge', icon: '👑' },
+    { key: 'consulta',      name: 'Pacote 3 Consultas', price: 'R$ 6,00',  period: 'pacote avulso', desc: '3 consultas completas · Todas as loterias · R$ 2,00 por consulta', icon: '🎯' },
+    { key: 'mistico',       name: 'Plano Místico',      price: 'R$ 9,90',  period: '7 dias',        desc: 'R$ 1,41 por dia · Consultas ilimitadas · Todas as loterias', icon: '🔮' },
+    { key: 'sagrado',       name: 'Plano Sagrado',      price: 'R$ 24,90', period: '30 dias',       desc: 'R$ 0,83 por dia · Consultas ilimitadas · Todas as loterias', icon: '👑' },
+    { key: 'premium_anual', name: 'Premium Anual',      price: 'R$ 99,00', period: '365 dias',      desc: 'R$ 0,27 por dia · Um ano de acesso completo · Melhor custo-benefício', icon: '✦', badge: 'Melhor Valor' },
   ];
 
-  var handleCheckout = function(plan) {
-    track('oraculo_checkout_started', { plan: plan });
-    fetch('/api/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: plan }),
-    })
-      .then(function(res) { return res.json(); })
-      .then(function(data) { if (data.url) window.location.href = data.url; })
-      .catch(function(err) { console.error('Checkout error:', err); });
+  var handleCheckout = async function(planoKey) {
+    track('oraculo_checkout_started', { plan: planoKey });
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.error('Checkout: sessão Supabase em falta');
+        alert('Sessão expirada. Por favor, faça login novamente.');
+        return;
+      }
+      const res = await fetch('/api/mp-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ plano: planoKey }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.init_point) {
+        console.error('Checkout falhou:', res.status, data);
+        alert('Falha ao iniciar pagamento. Tente novamente em instantes.');
+        return;
+      }
+      window.location.href = data.init_point;
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('Erro ao iniciar pagamento. Tente novamente.');
+    }
   };
 
   return (
@@ -309,7 +333,7 @@ function PlanPopup({ onClose, feature }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {plans.map(function(plan) {
-            var isFeatured = plan.key === 'mistico';
+            var isFeatured = plan.key === 'premium_anual';
             return (
               <div key={plan.key} style={{
                 background: isFeatured ? 'rgba(201,168,76,0.08)' : 'rgba(255,255,255,0.03)',
@@ -345,7 +369,7 @@ function PlanPopup({ onClose, feature }) {
                       fontFamily: "'Cinzel', serif", fontSize: 11, fontWeight: 700,
                       cursor: 'pointer', whiteSpace: 'nowrap',
                     }}>
-                      {plan.key === 'consulta' ? 'Comprar' : 'Assinar'}
+                      Comprar
                     </button>
                   </div>
                 </div>
@@ -355,7 +379,7 @@ function PlanPopup({ onClose, feature }) {
         </div>
 
         <p style={{ textAlign: 'center', fontSize: 11, color: COLORS.textMuted, marginTop: 20, fontStyle: 'italic' }}>
-          Pagamento seguro via Stripe · Cancele quando quiser
+          Pagamento seguro via Mercado Pago · Pix, cartão ou boleto
         </p>
       </div>
     </div>
