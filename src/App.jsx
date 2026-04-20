@@ -4,7 +4,6 @@ import { useAuth } from './AuthContext.jsx';
 import { generateMysticNumbers, getMoonPhase, LOTTERIES, FEATURES } from './oracle.js';
 import { supabase } from './auth.js';
 import { track } from '@vercel/analytics';
-import { PremiumBadge } from './components/PremiumSystem.jsx';
 
 const COLORS = {
   bg: "#0a0612", gold: "#c9a84c", goldLight: "#e8c97a", amber: "#d4813a",
@@ -794,7 +793,6 @@ export default function App() {
             );
             return false;
           })()}
-          <PremiumBadge />
         </div>
       </div>
 
