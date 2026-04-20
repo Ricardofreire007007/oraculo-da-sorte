@@ -9,9 +9,23 @@ const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_KEY)
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
   : null;
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 function tokenPreview(token) {
   if (!token) return '(vazio)';
   return token.slice(0, 20) + '...(len=' + token.length + ')';
+}
+
+async function readRawBody(req) {
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks).toString('utf8');
 }
 
 export default async function handler(req, res) {
@@ -34,23 +48,18 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: 'Método não permitido.' });
     }
 
-    // Vercel normalmente parseia JSON quando Content-Type é application/json,
-    // mas em alguns casos chega como string — tratar ambos.
-    let body = req.body;
-    if (typeof body === 'string') {
-      try {
-        body = body ? JSON.parse(body) : null;
-      } catch (parseErr) {
-        console.error('[redeem-code] Body string não é JSON válido:', parseErr.message);
-        return res.status(400).json({ error: 'Body inválido (JSON malformado).' });
-      }
-    }
-    if (!body || typeof body !== 'object') {
-      console.log('[redeem-code] Body ausente ou inválido. Tipo final:', typeof body);
-      return res.status(400).json({ error: 'Body obrigatório.' });
+    // bodyParser default do Vercel está desativado (ver config acima) — parse manual.
+    let body;
+    try {
+      const raw = await readRawBody(req);
+      console.log('[redeem-code] raw body length:', raw.length);
+      body = raw ? JSON.parse(raw) : {};
+    } catch (err) {
+      console.error('[redeem-code] body parse failed:', err.message);
+      return res.status(400).json({ error: 'Body JSON inválido.' });
     }
 
-    const { code } = body;
+    const { code } = body || {};
     if (!code || typeof code !== 'string') {
       console.log('[redeem-code] Campo "code" ausente ou tipo errado:', typeof code);
       return res.status(400).json({ error: 'Código obrigatório.' });
