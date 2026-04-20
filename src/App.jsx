@@ -271,7 +271,7 @@ function PlanPopup({ onClose, feature }) {
   var handleCheckout = async function(planoKey) {
     try {
       track('oraculo_checkout_started', { plan: planoKey });
-    } catch {}
+    } catch { /* silent */ }
     let accessToken = null;
     try {
       let raw = null;
@@ -286,7 +286,7 @@ function PlanPopup({ onClose, feature }) {
         const parsed = JSON.parse(raw);
         accessToken = parsed?.access_token || parsed?.currentSession?.access_token || null;
       }
-    } catch {}
+    } catch { /* silent */ }
     if (!accessToken) {
       alert('Sessão expirada. Por favor, faça login novamente.');
       return;
@@ -850,6 +850,13 @@ export default function App() {
           textAlign: 'center', color: COLORS.textMuted, fontSize: 11, marginTop: 48, opacity: 0.5, lineHeight: 1.6,
         }}>
           ⚖️ O Oráculo da Sorte é entretenimento espiritual. Não garantimos resultados em jogos de azar. Jogue com responsabilidade.
+        </p>
+        <p style={{
+          textAlign: 'center', color: COLORS.textMuted, fontSize: 10, marginTop: 8, opacity: 0.5,
+        }}>
+          <a href="/privacidade" style={{ color: 'inherit', textDecoration: 'underline' }}>Privacidade</a>
+          {' · '}
+          <a href="/termos" style={{ color: 'inherit', textDecoration: 'underline' }}>Termos</a>
         </p>
       </div>
 

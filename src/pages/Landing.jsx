@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
-import { supabase } from "../auth.js";
 import OnboardingPopup from "../OnboardingPopup.jsx";
 import { track } from "@vercel/analytics";
 
@@ -659,7 +659,11 @@ function Footer() {
         <div className="glow-line" style={{ marginBottom: 40 }} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
           <div><div className="cinzel-deco gradient-text" style={{ fontSize: 20, marginBottom: 8 }}>✦ Oráculo da Sorte</div><p style={{ color: COLORS.textMuted, fontSize: 13, fontStyle: "italic" }}>Entretenimento espiritual para quem joga com intenção.</p></div>
-          <div style={{ display: "flex", gap: 32 }}>{["Privacidade", "Termos", "Contato", "LGPD"].map(link => <span key={link} className="nav-link" style={{ fontSize: 12 }}>{link}</span>)}</div>
+          <div style={{ display: "flex", gap: 32 }}>
+            <Link to="/privacidade" className="nav-link" style={{ fontSize: 12 }}>Privacidade</Link>
+            <Link to="/termos" className="nav-link" style={{ fontSize: 12 }}>Termos</Link>
+            <a href="mailto:ricardofreire007@gmail.com" className="nav-link" style={{ fontSize: 12 }}>Contato</a>
+          </div>
         </div>
         <p style={{ textAlign: "center", color: COLORS.textMuted, fontSize: 12, marginTop: 40, opacity: 0.5 }}>© 2026 Oráculo da Sorte. Todos os direitos reservados.</p>
       </div>

@@ -6,6 +6,8 @@ import './index.css';
 import App from './App.jsx';
 import Landing from './pages/Landing.jsx';
 import PagamentoSucesso from './pages/PagamentoSucesso.jsx';
+import Privacidade from './pages/Privacidade.jsx';
+import Termos from './pages/Termos.jsx';
 import { AuthProvider } from './AuthContext.jsx';
 import { initRevenueCat, getOfferings } from './revenuecat.js';
 import { Analytics } from '@vercel/analytics/react';
@@ -22,6 +24,8 @@ initRevenueCat().then(async () => {
             <Route path="/" element={<Landing />} />
             <Route path="/app" element={<App />} />
             <Route path="/pagamento-sucesso" element={<PagamentoSucesso />} />
+            <Route path="/privacidade" element={<Privacidade />} />
+            <Route path="/termos" element={<Termos />} />
           </Routes>
           <Analytics />
           <SpeedInsights />
