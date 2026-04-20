@@ -269,14 +269,23 @@ function PlanPopup({ onClose, feature }) {
   ];
 
   var handleCheckout = async function(planoKey) {
-    track('oraculo_checkout_started', { plan: planoKey });
+    console.log('[MP] handleCheckout START', planoKey);
     try {
+      track('oraculo_checkout_started', { plan: planoKey });
+      console.log('[MP] track() ok');
+    } catch (err) {
+      console.error('[MP] track() threw', err);
+    }
+    try {
+      console.log('[MP] calling getSession');
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('[MP] session result:', session ? 'OK, user:' + session.user.id : 'NO SESSION');
       if (!session) {
-        console.error('Checkout: sessão Supabase em falta');
+        console.error('[MP] no session - aborting');
         alert('Sessão expirada. Por favor, faça login novamente.');
         return;
       }
+      console.log('[MP] calling fetch /api/mp-checkout');
       const res = await fetch('/api/mp-checkout', {
         method: 'POST',
         headers: {
@@ -285,15 +294,18 @@ function PlanPopup({ onClose, feature }) {
         },
         body: JSON.stringify({ plano: planoKey }),
       });
+      console.log('[MP] fetch returned', res.status);
       const data = await res.json();
+      console.log('[MP] response body:', data);
       if (!res.ok || !data.init_point) {
-        console.error('Checkout falhou:', res.status, data);
+        console.error('[MP] Checkout falhou:', res.status, data);
         alert('Falha ao iniciar pagamento. Tente novamente em instantes.');
         return;
       }
+      console.log('[MP] redirecting to', data.init_point);
       window.location.href = data.init_point;
     } catch (err) {
-      console.error('Checkout error:', err);
+      console.error('[MP] Checkout error caught:', err);
       alert('Erro ao iniciar pagamento. Tente novamente.');
     }
   };
