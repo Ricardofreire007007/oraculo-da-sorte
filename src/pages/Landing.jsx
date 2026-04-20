@@ -503,18 +503,34 @@ function HowItWorks() {
 // ── Planos ─────────────────────────────────────────────────────────
 async function handleCheckout(planoKey) {
   track('oraculo_checkout_started', { plan: planoKey });
+  let accessToken = null;
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      // Landing é público — se não autenticado, enviar para /app (trata do login)
-      window.location.href = '/app';
-      return;
+    let raw = null;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+        raw = localStorage.getItem(key);
+        break;
+      }
     }
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      accessToken = parsed?.access_token || parsed?.currentSession?.access_token || null;
+    }
+  } catch (err) {
+    console.error('Landing checkout: localStorage read failed', err);
+  }
+  if (!accessToken) {
+    // Landing é público — se não autenticado, enviar para /app (trata do login)
+    window.location.href = '/app';
+    return;
+  }
+  try {
     const res = await fetch('/api/mp-checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ plano: planoKey }),
     });

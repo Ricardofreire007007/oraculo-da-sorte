@@ -276,21 +276,37 @@ function PlanPopup({ onClose, feature }) {
     } catch (err) {
       console.error('[MP] track() threw', err);
     }
+    let accessToken = null;
     try {
-      console.log('[MP] calling getSession');
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('[MP] session result:', session ? 'OK, user:' + session.user.id : 'NO SESSION');
-      if (!session) {
-        console.error('[MP] no session - aborting');
-        alert('Sessão expirada. Por favor, faça login novamente.');
-        return;
+      console.log('[MP] reading token from localStorage');
+      let raw = null;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          raw = localStorage.getItem(key);
+          break;
+        }
       }
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        accessToken = parsed?.access_token || parsed?.currentSession?.access_token || null;
+      }
+      console.log('[MP] token from localStorage:', accessToken ? 'OK' : 'NOT FOUND');
+    } catch (err) {
+      console.error('[MP] localStorage read failed', err);
+    }
+    if (!accessToken) {
+      console.error('[MP] no accessToken - aborting');
+      alert('Sessão expirada. Por favor, faça login novamente.');
+      return;
+    }
+    try {
       console.log('[MP] calling fetch /api/mp-checkout');
       const res = await fetch('/api/mp-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ plano: planoKey }),
       });
