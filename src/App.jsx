@@ -1,5 +1,5 @@
 ﻿// src/App.jsx — Oráculo da Sorte: Fluxo Completo
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { generateMysticNumbers, getMoonPhase, LOTTERIES, FEATURES } from './oracle.js';
 import { supabase } from './auth.js';
@@ -632,27 +632,6 @@ function ResultView({ result, onNewConsult, onBackToStart }) {
 }
 
 // ══════════════════════════════════════
-//  BANNER PAGAMENTO SUCESSO
-// ══════════════════════════════════════
-function PaymentSuccessBanner({ onDismiss }) {
-  return (
-    <div style={{
-      background: 'rgba(61,140,110,0.12)', border: '1px solid rgba(61,140,110,0.4)',
-      borderRadius: 12, padding: '20px 24px', marginBottom: 24, textAlign: 'center',
-    }}>
-      <div style={{ fontSize: 28, marginBottom: 8 }}>🎉</div>
-      <h3 style={{ fontFamily: "'Cinzel', serif", fontSize: 15, color: COLORS.green, marginBottom: 6 }}>Pagamento confirmado!</h3>
-      <p style={{ color: COLORS.text, fontSize: 14 }}>Seus poderes místicos estão ativados.</p>
-      <button onClick={onDismiss} style={{
-        marginTop: 10, padding: '6px 16px', background: 'transparent',
-        border: '1px solid rgba(61,140,110,0.4)', borderRadius: 8,
-        color: COLORS.green, cursor: 'pointer', fontFamily: "'Cinzel', serif", fontSize: 11,
-      }}>Entendi ✦</button>
-    </div>
-  );
-}
-
-// ══════════════════════════════════════
 //  APP PRINCIPAL
 // ══════════════════════════════════════
 export default function App() {
@@ -664,24 +643,9 @@ export default function App() {
   var [selectedLottery, setSelectedLottery] = useState(null);
   var [result, setResult] = useState(null);
   var [showPlanPopup, setShowPlanPopup] = useState(false);
-  var [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
 
   var premium = isPremiumUser(profile);
   var planInfo = getPlanLabel(profile);
-
-  // Detectar retorno do pagamento
-  useEffect(function() {
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('pagamento') === 'sucesso') {
-      setShowPaymentSuccess(true);
-      window.history.replaceState({}, '', window.location.pathname);
-      if (refreshProfile) {
-        refreshProfile();
-        setTimeout(function() { refreshProfile(); }, 3000);
-        setTimeout(function() { refreshProfile(); }, 8000);
-      }
-    }
-  }, [refreshProfile]);
 
   var handleFeatureSelect = function(feature) {
     setSelectedFeature(feature);
@@ -822,8 +786,6 @@ export default function App() {
 
       {/* Content */}
       <div style={{ maxWidth: 660, margin: '0 auto', padding: '32px 20px' }}>
-
-        {showPaymentSuccess && <PaymentSuccessBanner onDismiss={function() { setShowPaymentSuccess(false); }} />}
 
         {/* Saudação */}
         {step === 'features' && (
