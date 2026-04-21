@@ -361,6 +361,20 @@ const styles = `
     .hero-grid p { margin-left: auto; margin-right: auto; }
     .hero-ctas, .hero-stats { justify-content: center; flex-wrap: wrap; }
   }
+
+  /* Hero compact mobile: section padding, crystal size, tagline width, DOM reorder via CSS */
+  .hero-section { padding: 120px 32px 80px; }
+  .hero-crystal { position: relative; width: 220px; height: 220px; }
+  .hero-tagline { max-width: 480px; }
+  .hero-orb { font-size: 80px; }
+
+  @media (max-width: 767px) {
+    .hero-section { padding: 80px 20px 48px; }
+    .hero-crystal-wrap { order: -1; }
+    .hero-crystal { width: 110px; height: 110px; }
+    .hero-orb { font-size: 48px; }
+    .hero-tagline { max-width: 280px; }
+  }
 `;
 
 // ── Stars ─────────────────────────────────────────────────────────
@@ -496,13 +510,13 @@ function Navbar({ activeSection, setActiveSection, user, login, logout }) {
 // ── Hero ───────────────────────────────────────────────────────────
 function Hero() {
   return (
-    <section id="Início" style={{ minHeight: "100vh", display: "flex", alignItems: "center", padding: "120px 32px 80px", position: "relative", zIndex: 1 }}>
+    <section id="Início" className="hero-section" style={{ minHeight: "100vh", display: "flex", alignItems: "center", position: "relative", zIndex: 1 }}>
       <div className="hero-grid">
         <div className="animate-fadeInUp">
-          <h1 className="cinzel-deco" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.2, marginBottom: 20 }}>
+          <h1 className="cinzel-deco" style={{ fontSize: "clamp(1.75rem, 6.5vw, 3.5rem)", lineHeight: 1.2, marginBottom: 20 }}>
             <span className="gradient-text">Escolha seus números</span><br /><span style={{ color: COLORS.text }}>com intenção</span>
           </h1>
-          <p style={{ fontSize: 19, lineHeight: 1.8, color: COLORS.textMuted, marginBottom: 16, maxWidth: 480 }}>
+          <p className="hero-tagline" style={{ fontSize: 19, lineHeight: 1.8, color: COLORS.textMuted, marginBottom: 16 }}>
             O único app brasileiro que une <em style={{ color: COLORS.text }}>numerologia ancestral</em>, espiritualidade e análise de dados reais da Caixa Econômica — tudo em um ritual personalizado para cada jogo.
           </p>
           <p style={{ fontSize: 15, color: COLORS.textMuted, marginBottom: 36, fontStyle: "italic" }}>Entretenimento espiritual. Jogue com intenção, não com sorte cega.</p>
@@ -516,11 +530,11 @@ function Hero() {
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <div className="animate-float" style={{ position: "relative", width: 220, height: 220 }}>
+        <div className="hero-crystal-wrap" style={{ display: "flex", justifyContent: "center" }}>
+          <div className="animate-float hero-crystal">
             <div style={{ position: "absolute", inset: -30, borderRadius: "50%", border: "1px solid rgba(201,168,76,0.15)", animation: "spin-slow 20s linear infinite" }} />
             <div style={{ position: "absolute", inset: -55, borderRadius: "50%", border: "1px dashed rgba(201,168,76,0.08)", animation: "spin-reverse 30s linear infinite" }} />
-            <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "radial-gradient(circle at 35% 35%, #3d2060, #1a0f35, #0d0820)", border: "2px solid rgba(201,168,76,0.4)", boxShadow: "0 0 60px rgba(61,30,100,0.6), 0 0 120px rgba(61,30,100,0.3), inset 0 0 40px rgba(201,168,76,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80 }}>🔮</div>
+            <div className="hero-orb" style={{ width: "100%", height: "100%", borderRadius: "50%", background: "radial-gradient(circle at 35% 35%, #3d2060, #1a0f35, #0d0820)", border: "2px solid rgba(201,168,76,0.4)", boxShadow: "0 0 60px rgba(61,30,100,0.6), 0 0 120px rgba(61,30,100,0.3), inset 0 0 40px rgba(201,168,76,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>🔮</div>
           </div>
         </div>
       </div>
