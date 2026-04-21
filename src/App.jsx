@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { generateMysticNumbers, getMoonPhase, LOTTERIES, FEATURES } from './oracle.js';
-import { supabase } from './auth.js';
+import { supabase, getAccessToken } from './auth.js';
 import { track } from '@vercel/analytics';
 
 const COLORS = {
@@ -275,21 +275,7 @@ function PlanPopup({ onClose, feature }) {
     try {
       track('oraculo_checkout_started', { plan: planoKey });
     } catch { /* silent */ }
-    let accessToken = null;
-    try {
-      let raw = null;
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
-          raw = localStorage.getItem(key);
-          break;
-        }
-      }
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        accessToken = parsed?.access_token || parsed?.currentSession?.access_token || null;
-      }
-    } catch { /* silent */ }
+    const accessToken = await getAccessToken();
     if (!accessToken) {
       alert('Sessão expirada. Por favor, faça login novamente.');
       return;

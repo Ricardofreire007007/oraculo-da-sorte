@@ -6,6 +6,13 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
+// Obter o access token da sessão corrente (para chamadas a APIs privadas).
+// Usa a sessão em memória do client partilhado — evita ler localStorage directamente.
+export async function getAccessToken() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || null;
+}
+
 export { supabase };
 
 // Login com Google

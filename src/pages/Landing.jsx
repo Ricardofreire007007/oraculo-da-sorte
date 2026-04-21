@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
+import { getAccessToken } from "../auth.js";
 import { track } from "@vercel/analytics";
 
 const COLORS = {
@@ -502,23 +503,7 @@ function HowItWorks() {
 // ── Planos ─────────────────────────────────────────────────────────
 async function handleCheckout(planoKey) {
   track('oraculo_checkout_started', { plan: planoKey });
-  let accessToken = null;
-  try {
-    let raw = null;
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
-        raw = localStorage.getItem(key);
-        break;
-      }
-    }
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      accessToken = parsed?.access_token || parsed?.currentSession?.access_token || null;
-    }
-  } catch (err) {
-    console.error('Landing checkout: localStorage read failed', err);
-  }
+  const accessToken = await getAccessToken();
   if (!accessToken) {
     // Landing é público — se não autenticado, enviar para /app (trata do login)
     window.location.href = '/app';
