@@ -184,6 +184,7 @@ function FeatureSelection({ onSelect }) {
 function LotterySelection({ feature, onSelect, onBack, isPremium, profile }) {
   var lotteryKeys = Object.keys(LOTTERIES);
   var featureData = FEATURES[feature];
+  var temCreditos = profile && profile.creditos_restantes > 0;
 
   return (
     <div>
@@ -221,7 +222,7 @@ function LotterySelection({ feature, onSelect, onBack, isPremium, profile }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
         {lotteryKeys.map(function(key) {
           var lot = LOTTERIES[key];
-          var isLocked = lot.premium && !isPremium;
+          var isLocked = lot.premium && !isPremium && !temCreditos;
 
           return (
             <button key={key}
@@ -248,7 +249,9 @@ function LotterySelection({ feature, onSelect, onBack, isPremium, profile }) {
 
       {!isPremium && (
         <p style={{ textAlign: 'center', fontSize: 13, color: COLORS.textMuted, marginTop: 16, fontStyle: 'italic' }}>
-          🔒 Assine um plano para desbloquear todas as loterias
+          {temCreditos
+            ? '✨ Seus créditos funcionam em qualquer loteria. Para acesso ilimitado, assine um plano.'
+            : '🔒 Assine um plano para desbloquear todas as loterias'}
         </p>
       )}
     </div>

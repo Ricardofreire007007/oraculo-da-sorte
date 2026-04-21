@@ -54,6 +54,25 @@ Mega Sena, Lotofácil, Quina, Lotomania, +Milionária (mecânica dual: 6 número
 
 A função `isPremiumUser()` em `src/App.jsx` considera premium: `mistico`, `sagrado`, `paid`.
 
+### 5.1 Contrato do sistema de planos e créditos
+
+`profiles.plano` representa APENAS estado de subscrição premium:
+- Valores válidos: `'free'`, `'mistico'`, `'sagrado'`, `'premium_anual'`
+- NUNCA deve ter valor `'consulta'` — esse é produto avulso ortogonal
+
+`profiles.creditos_restantes` é o contador de consultas avulsas:
+- Acumulável entre compras
+- Ortogonal ao plano (qualquer plano pode ter créditos)
+- Gate de acesso `temAcesso()` em `src/App.jsx` reconhece `creditos_restantes > 0` independentemente de `plano`
+
+O webhook MP (`api/mp-webhook.js`) implementa este contrato:
+- Para `plano === 'consulta'` (pacote 3 consultas): só incrementa `creditos_restantes`
+- Para `mistico` / `sagrado` / `premium_anual`: atualiza `profiles.plano` E `plano_expira_em`, com rank preservation (não baixa se user tem plano superior ativo)
+
+`RANK_PLANO.consulta = 0` existe apenas para a lógica de preservação, não como valor-alvo para `profiles.plano`.
+
+**⚠️ Aprendizado 21/04/2026:** o primeiro pagamento real de teste teve momentaneamente `plano='consulta'` em profiles devido a UPDATE manual de mitigação — revertido para `'free'` assim que o design foi compreendido. Qualquer debug futuro que veja `plano='consulta'` deve tratar como estado inválido e investigar.
+
 ---
 
 ## 6. Estrutura do repositório
