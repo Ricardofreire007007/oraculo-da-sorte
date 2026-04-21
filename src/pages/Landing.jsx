@@ -662,7 +662,7 @@ function Footer() {
           <div style={{ display: "flex", gap: 32 }}>
             <Link to="/privacidade" className="nav-link" style={{ fontSize: 12 }}>Privacidade</Link>
             <Link to="/termos" className="nav-link" style={{ fontSize: 12 }}>Termos</Link>
-            <a href="mailto:ricardofreire007@gmail.com" className="nav-link" style={{ fontSize: 12 }}>Contato</a>
+            <a href="mailto:contato@oraculo-da-sorte.com" className="nav-link" style={{ fontSize: 12 }}>Contato</a>
           </div>
         </div>
         <p style={{ textAlign: "center", color: COLORS.textMuted, fontSize: 12, marginTop: 40, opacity: 0.5 }}>© 2026 Oráculo da Sorte. Todos os direitos reservados.</p>

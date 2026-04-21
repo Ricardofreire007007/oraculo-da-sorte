@@ -1,6 +1,6 @@
 // src/pages/Privacidade.jsx
 // Política de Privacidade — conformidade LGPD (Lei 13.709/2018).
-// Última atualização: 20 de abril de 2026.
+// Última atualização: 21 de abril de 2026.
 
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -74,11 +74,11 @@ export default function Privacidade() {
 
       <main style={styles.main}>
         <h1 style={styles.h1}>Política de Privacidade</h1>
-        <p style={styles.updated}>Última atualização: 20 de abril de 2026</p>
+        <p style={styles.updated}>Última atualização: 21 de abril de 2026</p>
 
         <h2 style={styles.h2}>1. Quem somos</h2>
         <p style={styles.p}>
-          O Oráculo da Sorte é um serviço digital de entretenimento espiritual operado por Ricardo Freire. Esta política explica como tratamos seus dados pessoais quando você usa o site <strong>oraculo-da-sorte.com</strong> (o "Serviço"). Para qualquer dúvida ou pedido sobre seus dados, escreva para <a href="mailto:ricardofreire007@gmail.com" style={styles.a}>ricardofreire007@gmail.com</a>.
+          O Oráculo da Sorte ("Serviço") é uma plataforma digital de entretenimento espiritual, operada sob o CNPJ 66.365.439/0001-26 (nome fantasia: Oráculo da Sorte). Esta política explica como tratamos seus dados pessoais quando você usa o site <strong>oraculo-da-sorte.com</strong>. Para qualquer dúvida ou pedido sobre seus dados, escreva para <a href="mailto:contato@oraculo-da-sorte.com" style={styles.a}>contato@oraculo-da-sorte.com</a>.
         </p>
 
         <h2 style={styles.h2}>2. Quais dados recolhemos</h2>
@@ -148,7 +148,7 @@ export default function Privacidade() {
 
         <h2 style={styles.h2}>9. Como exercer seus direitos</h2>
         <p style={styles.p}>
-          Envie um email para <a href="mailto:ricardofreire007@gmail.com" style={styles.a}>ricardofreire007@gmail.com</a> com <strong>"LGPD"</strong> no assunto e descreva o pedido. Respondemos em até 15 dias corridos. Podemos pedir confirmação de identidade antes de executar pedidos sensíveis, como eliminação total.
+          Envie um email para <a href="mailto:contato@oraculo-da-sorte.com" style={styles.a}>contato@oraculo-da-sorte.com</a> com <strong>"LGPD"</strong> no assunto e descreva o pedido. Respondemos em até 15 dias corridos. Podemos pedir confirmação de identidade antes de executar pedidos sensíveis, como eliminação total.
         </p>
 
         <h2 style={styles.h2}>10. Cookies e analytics</h2>
@@ -175,7 +175,7 @@ export default function Privacidade() {
 
         <h2 style={styles.h2}>14. Contato</h2>
         <p style={styles.p}>
-          Para qualquer questão sobre esta política ou seus dados: <a href="mailto:ricardofreire007@gmail.com" style={styles.a}>ricardofreire007@gmail.com</a>.
+          Para qualquer questão sobre esta política ou seus dados: <a href="mailto:contato@oraculo-da-sorte.com" style={styles.a}>contato@oraculo-da-sorte.com</a>.
         </p>
         <p style={styles.p}>
           Veja também os <Link to="/termos" style={styles.a}>Termos de Uso</Link>.

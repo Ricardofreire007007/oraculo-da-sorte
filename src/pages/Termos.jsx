@@ -1,6 +1,6 @@
 // src/pages/Termos.jsx
 // Termos de Uso — conformidade CDC, LGPD e Lei 14.790/2023.
-// Última atualização: 20 de abril de 2026.
+// Última atualização: 21 de abril de 2026.
 
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -74,11 +74,11 @@ export default function Termos() {
 
       <main style={styles.main}>
         <h1 style={styles.h1}>Termos de Uso</h1>
-        <p style={styles.updated}>Última atualização: 20 de abril de 2026</p>
+        <p style={styles.updated}>Última atualização: 21 de abril de 2026</p>
 
         <h2 style={styles.h2}>1. Aceitação dos termos</h2>
         <p style={styles.p}>
-          Ao usar o Oráculo da Sorte ("Serviço"), você declara ter lido, compreendido e aceite estes Termos de Uso. Se não concorda com algum ponto, por favor não use o Serviço.
+          Ao usar o Oráculo da Sorte ("Serviço"), operado sob o CNPJ 66.365.439/0001-26 (nome fantasia: Oráculo da Sorte), você declara ter lido, compreendido e aceite estes Termos de Uso. Se não concorda com algum ponto, por favor não use o Serviço.
         </p>
 
         <h2 style={styles.h2}>2. O que é o Oráculo da Sorte</h2>
@@ -129,7 +129,7 @@ export default function Termos() {
 
         <h2 style={styles.h2}>6. Direito de arrependimento e reembolsos</h2>
         <p style={styles.p}>
-          O consumidor tem direito de arrependimento em até 7 dias após a compra, nos termos do Art. 49 do Código de Defesa do Consumidor brasileiro. Para exercer, envie email para <a href="mailto:ricardofreire007@gmail.com" style={styles.a}>ricardofreire007@gmail.com</a> com <strong>"Arrependimento"</strong> no assunto. Após esse prazo, reembolsos só serão analisados em caso de erro técnico comprovado.
+          O consumidor tem direito de arrependimento em até 7 dias após a compra, nos termos do Art. 49 do Código de Defesa do Consumidor brasileiro. Para exercer, envie email para <a href="mailto:contato@oraculo-da-sorte.com" style={styles.a}>contato@oraculo-da-sorte.com</a> com <strong>"Arrependimento"</strong> no assunto. Após esse prazo, reembolsos só serão analisados em caso de erro técnico comprovado.
         </p>
         <p style={styles.p}>
           Pedidos de reembolso são processados pelo Mercado Pago; o valor é devolvido pelo mesmo meio de pagamento usado na compra.
@@ -150,12 +150,12 @@ export default function Termos() {
           Reservamo-nos o direito de <strong>suspender ou cancelar contas</strong> que violem estes termos, sem reembolso, mediante aviso prévio razoável (exceto em casos graves que exijam ação imediata).
         </p>
         <p style={styles.p}>
-          Você pode <strong>pedir a eliminação da sua conta</strong> a qualquer momento enviando email para <a href="mailto:ricardofreire007@gmail.com" style={styles.a}>ricardofreire007@gmail.com</a>. A eliminação é processada em até 30 dias, respeitando obrigações legais de retenção (ver <Link to="/privacidade" style={styles.a}>Política de Privacidade</Link>).
+          Você pode <strong>pedir a eliminação da sua conta</strong> a qualquer momento enviando email para <a href="mailto:contato@oraculo-da-sorte.com" style={styles.a}>contato@oraculo-da-sorte.com</a>. A eliminação é processada em até 30 dias, respeitando obrigações legais de retenção (ver <Link to="/privacidade" style={styles.a}>Política de Privacidade</Link>).
         </p>
 
         <h2 style={styles.h2}>9. Propriedade intelectual</h2>
         <p style={styles.p}>
-          Todo o conteúdo do Oráculo da Sorte — código-fonte, design, textos, ilustrações, nomes, marcas e sistemas de geração mística — é propriedade de Ricardo Freire, protegido por direitos autorais e legislação brasileira aplicável.
+          Todo o conteúdo do Oráculo da Sorte — código-fonte, design, textos, ilustrações, nomes, marcas e sistemas de geração mística — é propriedade do Oráculo da Sorte (CNPJ 66.365.439/0001-26), protegido por direitos autorais e legislação brasileira aplicável.
         </p>
         <p style={styles.p}>
           Você pode usar o Serviço livremente para fins pessoais. Não pode copiar, reproduzir ou distribuir o conteúdo comercialmente sem autorização prévia por escrito.
@@ -187,7 +187,7 @@ export default function Termos() {
 
         <h2 style={styles.h2}>13. Contato</h2>
         <p style={styles.p}>
-          Para qualquer dúvida sobre estes termos: <a href="mailto:ricardofreire007@gmail.com" style={styles.a}>ricardofreire007@gmail.com</a>.
+          Para qualquer dúvida sobre estes termos: <a href="mailto:contato@oraculo-da-sorte.com" style={styles.a}>contato@oraculo-da-sorte.com</a>.
         </p>
         <p style={styles.p}>
           Veja também a <Link to="/privacidade" style={styles.a}>Política de Privacidade</Link>.
