@@ -2,6 +2,42 @@
 
 Lista de problemas conhecidos a resolver em sessões futuras dedicadas. Cada item deve ser tratado isoladamente, com revisão e testes.
 
+## Bugs descobertos em 21/04/2026
+
+Durante o teste do primeiro pagamento real e validação do fix do onboarding em mobile emulation.
+
+### Crítica — bloqueador de conversão
+
+**1. OAuth 403 `disallowed_useragent` em WebViews in-app**
+
+Utilizadores que tentam logar Google dentro do Instagram, TikTok ou Facebook Messenger recebem erro 403 "Esta app não está em conformidade com a Política de 'Utilizar navegadores seguros' da Google". Resultado: zero conversão de tráfego social. Solução típica: forçar o link a abrir em browser externo (Safari/Chrome) em vez de WebView. Investigar: `window.open`, `target="_blank"` com prompts de "Abrir em Safari", detectar user agent de WebView e mostrar aviso. Descoberto a 21/04 ao tentar validar OAuth em DevTools mobile emulation (reproduz o mesmo erro).
+
+### Alta — quebra funcional parcial
+
+**2. Botão SAIR não funciona em mobile**
+
+Clicar em "SAIR" no header não faz logout. Console: "Multiple GoTrueClient instances detected" + "Lock was not released within 5000ms". É manifestação adicional do bug Multiple GoTrueClient conhecido (ver secção "Múltiplos clientes Supabase"); o workaround de localStorage só cobriu o checkout. Confirma que o refactor singleton Supabase também precisa de incluir a lógica de signOut.
+
+**3. Gate de `/app` não valida campos críticos do perfil**
+
+Utilizador com `data_nascimento=NULL` consegue entrar na `/app` sem ser redirecionado para onboarding. Provavelmente o gate actual valida apenas `onboarding_done`, mas o frontend depois usa `onboarding_done` de forma inconsistente (ignora-o noutros pontos). Resultado: perfis podem estar em estado parcial e ainda permitir acesso. Recomendação: gate único robusto que exige todos os campos críticos (`data_nascimento`, `nome`, `cidade` ou `birth_city`) preenchidos antes de permitir entrada.
+
+**4. Crash no render com dados parciais**
+
+`Uncaught TypeError: Cannot read properties of null (reading 'replace')` em `index-Dqf3k_kM.js:33:45707`. Dispara quando o utilizador tem perfil com `data_nascimento=NULL` e a `/app` tenta renderizar a consulta de entrada. Origem provável: `src/oracle.js` ou lógica de geração assume que data está sempre preenchida e chama `.replace()` nela sem null check. Fix: adicionar validação ou short-circuit se campos críticos forem null (redirecionar para onboarding em vez de tentar renderizar).
+
+### Média — UX degradada
+
+**5. Bug 1a — Geocoding de cidade falha silenciosamente no onboarding**
+
+Reportado pela amiga em iPhone 12 Safari. Digitou "Sao paulo" em SUA LOCALIZAÇÃO e a lista de autocomplete (cidade / lat / lng / timezone) não apareceu, mostrando "Não foi possível detectar automaticamente. Digite sua cidade". API usada: `api.bigdatacloud.net/data/reverse-geocode-client` (pública, sem API key), em `src/OnboardingPopup.jsx:39`. Hipóteses: quota esgotada, CORS, timeout 10s muito curto em mobile 4G, ou a API está a devolver resultado vazio e o componente não trata. Não investigado a fundo.
+
+### Bugs do dia que FORAM fixados
+
+- **Bug 1b — Scroll do botão Continuar no onboarding** → fix em `src/OnboardingPopup.jsx` (commit `f63c227`), validação em iPhone real pendente
+- **Opção X — Créditos desbloqueiam qualquer loteria** → fix em `src/App.jsx` (commit `162cc26`)
+- **Nome pessoal e email gmail expostos nas páginas legais** → fix em `src/pages/Privacidade.jsx` + `src/pages/Termos.jsx` (commit `4e412f2`)
+
 ## Lint errors em áreas proibidas (13 totais)
 
 - `src/oracle.js` — 3 unused vars (lifeNum, location, birthDetail). Trivial de remover, mas oracle.js é área crítica.
