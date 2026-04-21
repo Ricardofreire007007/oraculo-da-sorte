@@ -1,6 +1,9 @@
 // src/AuthContext.jsx
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { track } from '@vercel/analytics';
 import { supabase, getUser, getProfile, signInWithGoogle, signOut } from './auth.js';
+import { detectInAppBrowser } from './lib/inAppBrowser.js';
+import InAppBrowserWarning from './components/InAppBrowserWarning.jsx';
 
 const AuthContext = createContext({});
 
@@ -11,6 +14,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showInAppWarning, setShowInAppWarning] = useState(false);
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
@@ -60,6 +64,16 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async () => {
+    if (detectInAppBrowser()) {
+      try { track('oraculo_inapp_detected'); } catch { /* analytics opcional */ }
+      setShowInAppWarning(true);
+      return;
+    }
+    await signInWithGoogle();
+  };
+
+  const proceedAnyway = async () => {
+    setShowInAppWarning(false);
     await signInWithGoogle();
   };
 
@@ -89,6 +103,11 @@ export function AuthProvider({ children }) {
       refreshProfile,
     }}>
       {children}
+      <InAppBrowserWarning
+        open={showInAppWarning}
+        onClose={() => setShowInAppWarning(false)}
+        onProceedAnyway={proceedAnyway}
+      />
     </AuthContext.Provider>
   );
 }
