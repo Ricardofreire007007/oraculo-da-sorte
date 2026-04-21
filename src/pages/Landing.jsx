@@ -375,6 +375,49 @@ const styles = `
     .hero-orb { font-size: 48px; }
     .hero-tagline { max-width: 280px; }
   }
+
+  /* Plans: desktop grid, mobile horizontal carousel with scroll-snap */
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px; align-items: start;
+  }
+  .plan-card { position: relative; }
+  .plan-highlight {
+    border: 2px solid ${COLORS.goldLight};
+    box-shadow: 0 0 40px rgba(232,201,122,0.18);
+    transform: scale(1.03);
+    overflow: visible; /* override .card-mystical overflow:hidden so top badge shows */
+  }
+  .plan-top-badge {
+    position: absolute; top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold});
+    color: #1a0f00;
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 20px; white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(232,201,122,0.3);
+    z-index: 2;
+  }
+
+  @media (max-width: 767px) {
+    .plans-grid {
+      display: flex; gap: 16px;
+      overflow-x: auto; overflow-y: visible;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-padding-inline: 20px;
+      padding: 16px 4px 24px;
+      scrollbar-width: none;
+    }
+    .plans-grid::-webkit-scrollbar { display: none; }
+    .plans-grid > .plan-card {
+      flex: 0 0 80%; min-width: 260px; max-width: 340px;
+      scroll-snap-align: center;
+    }
+    .plan-highlight { transform: none; } /* no scale em mobile (interfere com snap) */
+  }
 `;
 
 // ── Stars ─────────────────────────────────────────────────────────
@@ -710,9 +753,9 @@ async function handleCheckout(planoKey) {
 function Pricing() {
   var plans = [
     { key: "consulta",      name: "Pacote 3 Consultas", icon: "🎯", price: "R$ 6,00",  period: "pacote avulso", color: COLORS.textMuted, features: ["✓ 3 consultas completas", "✓ Todas as loterias brasileiras", "✓ R$ 2,00 por consulta"], cta: "Comprar", highlight: false },
-    { key: "mistico",       name: "Místico",            icon: "🔮", price: "R$ 9,90",  period: "7 dias",        color: COLORS.gold,      features: ["✓ R$ 1,41 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: false },
+    { key: "mistico",       name: "Místico",            icon: "🔮", price: "R$ 9,90",  period: "7 dias",        color: COLORS.gold,      topBadge: "Mais escolhido", features: ["✓ R$ 1,41 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: true },
     { key: "sagrado",       name: "Sagrado",            icon: "👑", price: "R$ 24,90", period: "30 dias",       color: COLORS.amber,     features: ["✓ R$ 0,83 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: false },
-    { key: "premium_anual", name: "Premium Anual",      icon: "✦", price: "R$ 99,00", period: "365 dias",      color: COLORS.goldLight, badge: "Melhor Valor", features: ["✓ R$ 0,27 por dia", "✓ Um ano de acesso completo", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Melhor custo-benefício"], cta: "Comprar", highlight: true },
+    { key: "premium_anual", name: "Premium Anual",      icon: "✦", price: "R$ 99,00", period: "365 dias",      color: COLORS.goldLight, badge: "Melhor Valor", features: ["✓ R$ 0,27 por dia", "✓ Um ano de acesso completo", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Melhor custo-benefício"], cta: "Comprar", highlight: false },
   ];
   return (
     <section id="planos" style={{ padding: "100px 32px", position: "relative", zIndex: 1 }}>
@@ -720,9 +763,10 @@ function Pricing() {
         <p className="cinzel" style={{ textAlign: "center", color: COLORS.gold, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 12 }}>PLANOS</p>
         <h2 className="section-title" style={{ color: COLORS.text, marginBottom: 12 }}>Escolha seu <span className="gradient-text">caminho espiritual</span></h2>
         <p style={{ textAlign: "center", color: COLORS.textMuted, fontSize: 17, marginBottom: 56, fontStyle: "italic" }}>Comece grátis. Evolua quando sentir a chamada.</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, alignItems: "start" }}>
+        <div className="plans-grid">
           {plans.map((plan) => (
-            <div key={plan.key} className="card-mystical" style={{ padding: 36, ...(plan.highlight ? { border: `2px solid ${COLORS.goldLight}`, boxShadow: "0 0 40px rgba(232,201,122,0.18)", transform: "scale(1.03)" } : {}) }}>
+            <div key={plan.key} className={`card-mystical plan-card${plan.highlight ? " plan-highlight" : ""}`} style={{ padding: 36 }}>
+              {plan.topBadge && <div className="plan-top-badge">{plan.topBadge}</div>}
               {plan.badge && <div style={{ background: `linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold})`, color: "#1a0f00", fontSize: 11, fontFamily: "'Cinzel', serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 14px", borderRadius: 20, display: "inline-block", marginBottom: 16 }}>{plan.badge}</div>}
               <div style={{ fontSize: 40, marginBottom: 12 }}>{plan.icon}</div>
               <h3 className="cinzel" style={{ fontSize: 20, color: plan.color, marginBottom: 8 }}>{plan.name}</h3>
