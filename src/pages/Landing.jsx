@@ -283,6 +283,72 @@ const styles = `
     .orbit-system { transform: scale(0.65) !important; }
     .orbit-sat { width: 80px; height: 80px; margin-left: -40px; margin-top: -40px; }
   }
+
+  /* ═══════════════════════════════════════════════════
+     MOBILE REFACTOR — mobile-first overrides
+     ═══════════════════════════════════════════════════ */
+
+  /* Navbar: desktop links wrapper + hamburger */
+  .nav-desktop { display: flex; gap: 32px; align-items: center; }
+  .nav-hamburger {
+    display: none;
+    width: 44px; height: 44px;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    padding: 0; cursor: pointer;
+    flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+    transition: border-color 0.2s;
+  }
+  .nav-hamburger:hover { border-color: ${COLORS.gold}; }
+  .nav-hamburger span {
+    display: block; width: 20px; height: 2px;
+    background: ${COLORS.gold}; border-radius: 1px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Drawer overlay + panel */
+  @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  .nav-drawer-overlay {
+    position: fixed; inset: 0; z-index: 99;
+    background: rgba(10,6,18,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: fadeInOverlay 0.25s ease;
+    display: flex; justify-content: flex-end;
+  }
+  .nav-drawer {
+    width: 100%; max-width: 320px; height: 100%;
+    background: linear-gradient(135deg, #0f0a1e 0%, #160f28 100%);
+    border-left: 1px solid rgba(201,168,76,0.2);
+    padding: 88px 28px 32px;
+    display: flex; flex-direction: column;
+    animation: slideInRight 0.3s ease;
+    box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+  }
+  .nav-drawer-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
+  .nav-drawer-link {
+    background: transparent; border: none;
+    text-align: left; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 15px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    transition: color 0.2s, padding-left 0.2s;
+  }
+  .nav-drawer-link:hover,
+  .nav-drawer-link:focus-visible { color: ${COLORS.gold}; padding-left: 6px; outline: none; }
+  .nav-drawer-cta { padding-top: 24px; border-top: 1px solid rgba(201,168,76,0.15); margin-top: 16px; }
+
+  /* Mobile-only breakpoint: swap desktop nav for hamburger */
+  @media (max-width: 767px) {
+    .nav-desktop { display: none !important; }
+    .nav-hamburger { display: flex !important; }
+  }
 `;
 
 // ── Stars ─────────────────────────────────────────────────────────
@@ -308,26 +374,110 @@ function Stars() {
 }
 
 // ── Navbar ─────────────────────────────────────────────────────────
+const NAV_ITEMS = ["Início", "caminhos", "como-funciona", "planos", "faq"];
+const navLabel = (item) =>
+  item === "caminhos" ? "Caminhos" :
+  item === "como-funciona" ? "Como Funciona" :
+  item === "faq" ? "FAQ" :
+  item === "planos" ? "Planos" :
+  item;
+
 function Navbar({ activeSection, setActiveSection, user, login, logout }) {
   const [scrolled, setScrolled] = useState(false);
-  useEffect(() => { const h = () => setScrolled(window.scrollY > 40); window.addEventListener("scroll", h); return () => window.removeEventListener("scroll", h); }, []);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+
+  // Drawer: lock body scroll + close on ESC
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") setDrawerOpen(false); };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [drawerOpen]);
+
+  const goTo = (item) => {
+    setActiveSection(item);
+    setDrawerOpen(false);
+    document.getElementById(item)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleLogin = () => { track('oraculo_login_clicked'); setDrawerOpen(false); login(); };
+  const handleLogout = () => { setDrawerOpen(false); logout(); };
+
   return (
-    <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: scrolled ? "rgba(10,6,18,0.95)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(201,168,76,0.1)" : "none", transition: "all 0.3s ease", padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <div className="cinzel-deco gradient-text" style={{ fontSize: 18 }}>✦ Oráculo da Sorte</div>
-      <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-        {["Início", "caminhos", "como-funciona", "planos", "faq"].map((item) => (
-          <span key={item} className="nav-link" onClick={() => { setActiveSection(item); document.getElementById(item)?.scrollIntoView({ behavior: 'smooth' }); }}
-            style={{ color: activeSection === item ? COLORS.gold : undefined }}>
-            {item === 'caminhos' ? 'Caminhos' : item === 'como-funciona' ? 'Como Funciona' : item}
-          </span>
-        ))}
-        {user ? (
-          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={logout}>Sair</button>
-        ) : (
-          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={() => { track('oraculo_login_clicked'); login(); }}>Entrar com Google</button>
-        )}
-      </div>
-    </nav>
+    <>
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: scrolled ? "rgba(10,6,18,0.95)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(201,168,76,0.1)" : "none", transition: "all 0.3s ease", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="cinzel-deco gradient-text" style={{ fontSize: 18 }}>✦ Oráculo da Sorte</div>
+
+        {/* Desktop nav */}
+        <div className="nav-desktop">
+          {NAV_ITEMS.map((item) => (
+            <span key={item} className="nav-link" onClick={() => goTo(item)}
+              style={{ color: activeSection === item ? COLORS.gold : undefined }}>
+              {navLabel(item)}
+            </span>
+          ))}
+          {user ? (
+            <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={handleLogout}>Sair</button>
+          ) : (
+            <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={handleLogin}>Entrar com Google</button>
+          )}
+        </div>
+
+        {/* Mobile hamburger */}
+        <button
+          type="button"
+          className={`nav-hamburger ${drawerOpen ? "open" : ""}`}
+          aria-label={drawerOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={drawerOpen}
+          aria-controls="nav-drawer-panel"
+          onClick={() => setDrawerOpen((v) => !v)}
+        >
+          <span /><span /><span />
+        </button>
+      </nav>
+
+      {/* Mobile drawer */}
+      {drawerOpen && (
+        <div className="nav-drawer-overlay" onClick={() => setDrawerOpen(false)}>
+          <div
+            id="nav-drawer-panel"
+            className="nav-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu principal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="nav-drawer-links">
+              {NAV_ITEMS.map((item) => (
+                <button key={item} type="button" className="nav-drawer-link"
+                  onClick={() => goTo(item)}
+                  style={{ color: activeSection === item ? COLORS.gold : COLORS.text }}>
+                  {navLabel(item)}
+                </button>
+              ))}
+            </div>
+            <div className="nav-drawer-cta">
+              {user ? (
+                <button className="btn-primary" style={{ width: "100%" }} onClick={handleLogout}>Sair</button>
+              ) : (
+                <button className="btn-primary" style={{ width: "100%" }} onClick={handleLogin}>Entrar com Google</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
