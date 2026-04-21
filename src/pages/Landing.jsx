@@ -349,6 +349,18 @@ const styles = `
     .nav-desktop { display: none !important; }
     .nav-hamburger { display: flex !important; }
   }
+
+  /* Hero: 2-col grid collapses to 1-col centered in mobile */
+  .hero-grid {
+    max-width: 1100px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  @media (max-width: 767px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+    .hero-grid p { margin-left: auto; margin-right: auto; }
+    .hero-ctas, .hero-stats { justify-content: center; flex-wrap: wrap; }
+  }
 `;
 
 // ── Stars ─────────────────────────────────────────────────────────
@@ -485,7 +497,7 @@ function Navbar({ activeSection, setActiveSection, user, login, logout }) {
 function Hero() {
   return (
     <section id="Início" style={{ minHeight: "100vh", display: "flex", alignItems: "center", padding: "120px 32px 80px", position: "relative", zIndex: 1 }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+      <div className="hero-grid">
         <div className="animate-fadeInUp">
           <h1 className="cinzel-deco" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.2, marginBottom: 20 }}>
             <span className="gradient-text">Escolha seus números</span><br /><span style={{ color: COLORS.text }}>com intenção</span>
@@ -494,11 +506,11 @@ function Hero() {
             O único app brasileiro que une <em style={{ color: COLORS.text }}>numerologia ancestral</em>, espiritualidade e análise de dados reais da Caixa Econômica — tudo em um ritual personalizado para cada jogo.
           </p>
           <p style={{ fontSize: 15, color: COLORS.textMuted, marginBottom: 36, fontStyle: "italic" }}>Entretenimento espiritual. Jogue com intenção, não com sorte cega.</p>
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div className="hero-ctas" style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             <button className="btn-primary animate-pulse-gold" onClick={() => window.location.href = "/app"}>✦ Começar Agora</button>
             <button className="btn-outline" onClick={() => document.getElementById('caminhos')?.scrollIntoView({ behavior: 'smooth' })}>Ver Caminhos Místicos</button>
           </div>
-          <div style={{ display: "flex", gap: 32, marginTop: 40 }}>
+          <div className="hero-stats" style={{ display: "flex", gap: 32, marginTop: 40 }}>
             {[["5 Rituais", "caminhos místicos"], ["7 Loterias", "suportadas"], ["R$9,99", "plano semanal"]].map(([num, label]) => (
               <div key={label}><div className="cinzel gradient-text" style={{ fontSize: 22, fontWeight: 700 }}>{num}</div><div style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 2 }}>{label}</div></div>
             ))}
