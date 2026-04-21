@@ -2,7 +2,7 @@
 
 > Documento de transição entre sessões. Lê isto antes de fazeres qualquer recomendação ou avançar com qualquer missão. Este documento substitui memórias parciais ou desatualizadas.
 
-**Última atualização:** sessão de 11 de abril de 2026
+**Última atualização:** sessão de 21 de abril de 2026 (tarde)
 **Última pessoa a editar:** Claude (via conversa com Ricardo)
 
 ---
@@ -290,6 +290,56 @@ Os agentes podem **LER** estes ficheiros para entender comportamento, mas não m
 7. Investigação: confirmado que banner de comunidade antigo (commits `f0f33de`, `5b86531`, `4996e74`) usava números hardcoded — nunca houve cruzamento real com sorteios
 8. Bug encontrado e resolvido: UPDATE via supabase client anon falhava silenciosamente (`data: null`). Fix: `await supabase.auth.getUser()` antes de cada UPDATE para "acordar" a sessão. Padrão importante para futuro.
 9. Commits: `24f03d1` (paywall), `160b555` (debug), `4327bba` (debug+select), `f1a70e8` (cleanup), `d5e3cb6` (wake up session)
+
+### Sessão de 21 de Abril de 2026 (tarde) — Fase 1 Refactor Mobile
+
+Baseado em proposta world-class discutida com Claude (web). Entregou 6 commits atómicos focados em UX mobile da Landing, zero risco em áreas proibidas, validados em iPhone real.
+
+Commits (`b719994` → `0dd4912`):
+1. `b719994` feat(landing): menu hamburger com drawer em mobile
+2. `73c12d9` fix(landing): centrar conteudo e remover colunas fantasma em mobile
+3. `bc87e81` refactor(landing): hero compacto e cristal visivel em mobile
+4. `d81202e` feat(landing): planos em carrossel horizontal com snap scroll
+5. `3770443` feat(landing): sticky CTA no fundo em mobile
+6. `0dd4912` polish(landing): stats horizontais, tipografia fluida, Cinzel letter-spacing
+
+Mudanças principais:
+- Menu hamburger (<768px) com drawer full-screen, a11y (aria-modal, ESC, scroll lock), traços que animam para X
+- Conteúdo centrado em mobile via `.hero-grid` colapsando 2-col→1-col
+- Cristal reduzido de 220px para 110px em mobile, reordenado via `order: -1` (DOM intacto)
+- H1 tipografia `clamp(1.75rem, 6.5vw, 3.5rem)`, hero padding 80px/20px/48px (poupa ~72px vertical)
+- Planos em carrossel horizontal com `scroll-snap-type: x mandatory` em mobile, grid desktop preservado. Destaque movido de Premium Anual para Místico (+ badge "Mais escolhido"). Premium Anual mantém apenas badge "Melhor Valor" (factual).
+- Sticky CTA no fundo (mobile-only) com `safe-area-inset-bottom`, track event `oraculo_sticky_cta_clicked`, `z-index: 50` (abaixo do drawer 99)
+- Stats em barra horizontal com border top/bottom dourados ténues e separadores verticais via `::before`
+- Tipografia fluida pontual em logo navbar e stat numbers
+- Cinzel letter-spacing 0.1em→0.2em em usos ≤11px (`.orbit-label`, `.plan-top-badge`, badge "Melhor Valor", "Aviso Legal")
+
+Commit 7 (viewport) não foi necessário — teste 1.2 em iPhone confirmou que pinch-out já mantém layout mobile após os 6 commits obrigatórios.
+
+Validação iPhone real (Safari):
+- T1.1 página completa sem necessidade de zoom out: ✅
+- T1.2 pinch-out mantém layout mobile: ✅
+- T1.3 hamburger + drawer: ✅
+- T1.4 hero: ✅
+- T1.5 stats bar: ✅
+- T1.6 carrossel de planos: ✅
+- T1.7 sticky CTA: ✅
+- T1.8 sticky + drawer interação: ✅
+
+Deploy: via branch `fase1-mobile` → PR #1 → merge para `main` → Vercel production.
+
+Ficheiros alterados (único): `src/pages/Landing.jsx` (+315 linhas, -34 linhas).
+
+Áreas proibidas: zero tocadas. Commit 7 opcional (`index.html`) dispensado.
+
+Tech-debt anotado para sessão futura (não-bloqueante):
+- Padding nav 32px→20px pode apertar logo em ≥1024px (verificar)
+- Drawer sem focus trap (Tab sai para página por baixo)
+- Altura dos 2 botões sticky CTA pode destoar (`btn-primary` vs `btn-outline`)
+- Separador vertical do `.hero-stats` a `left: 0` pode ficar apertado contra texto anterior em iPhones pequenos (alternativa: `left: -8px` ou `:not(:last-child)` com `right: 0`)
+- Rings do cristal (inset -30 e -55) em 110px box dão boxes externos 170/220px — se em iPhone real tocarem margens, reduzir para -20/-35
+
+Próximo passo: medir conversão 7-10 dias com Vercel Analytics (scroll depth, clicks no sticky) antes de decidir Fase 2 (smart plan selector + bottom sheet + price anchoring).
 
 ---
 
