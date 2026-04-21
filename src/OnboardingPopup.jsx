@@ -60,8 +60,9 @@ export default function OnboardingPopup({ userId, onComplete }) {
             setLocStatus('error');
           });
       },
-      function() {
-        setLocStatus('error');
+      function(err) {
+        // err.code: 1=PERMISSION_DENIED, 2=POSITION_UNAVAILABLE, 3=TIMEOUT
+        setLocStatus(err && err.code === 1 ? 'denied' : 'error');
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
     );
@@ -221,7 +222,7 @@ export default function OnboardingPopup({ userId, onComplete }) {
               </div>
             )}
 
-            {(locStatus === 'error' || locStatus === 'idle') && (
+            {(locStatus === 'error' || locStatus === 'idle' || locStatus === 'denied') && (
               <input
                 type="text"
                 value={birthCity}
@@ -238,9 +239,14 @@ export default function OnboardingPopup({ userId, onComplete }) {
               />
             )}
 
+            {locStatus === 'denied' && (
+              <p style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 6, fontStyle: 'italic' }}>
+                Permissão de localização foi recusada. Digite sua cidade abaixo — isto funciona igualmente bem.
+              </p>
+            )}
             {locStatus === 'error' && (
               <p style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 6, fontStyle: 'italic' }}>
-                Não foi possível detectar automaticamente. Digite sua cidade.
+                Não foi possível detectar automaticamente. Digite sua cidade e estado (ex: São Paulo, SP). Usamos só para cálculos místicos.
               </p>
             )}
           </div>
@@ -253,17 +259,17 @@ export default function OnboardingPopup({ userId, onComplete }) {
           {/* Botão */}
           <button
             onClick={handleSubmit}
-            disabled={!fullName.trim() || !birthDate || saving}
+            disabled={!fullName.trim() || !birthDate || !birthCity?.trim() || saving}
             style={{
               padding: '16px',
-              background: (!fullName.trim() || !birthDate || saving)
+              background: (!fullName.trim() || !birthDate || !birthCity?.trim() || saving)
                 ? 'rgba(201,168,76,0.2)'
                 : 'linear-gradient(135deg, #c9a84c, #8a7230)',
-              color: (!fullName.trim() || !birthDate || saving) ? COLORS.textMuted : '#06060e',
+              color: (!fullName.trim() || !birthDate || !birthCity?.trim() || saving) ? COLORS.textMuted : '#06060e',
               border: 'none', borderRadius: 12,
               fontSize: 16, fontWeight: 700,
               fontFamily: "'Cinzel', serif",
-              cursor: (!fullName.trim() || !birthDate || saving) ? 'not-allowed' : 'pointer',
+              cursor: (!fullName.trim() || !birthDate || !birthCity?.trim() || saving) ? 'not-allowed' : 'pointer',
               letterSpacing: '0.05em',
               transition: 'all 0.2s ease',
             }}
