@@ -418,6 +418,28 @@ const styles = `
     }
     .plan-highlight { transform: none; } /* no scale em mobile (interfere com snap) */
   }
+
+  /* Sticky mobile CTA (visible < 768px only) */
+  .sticky-cta { display: none; }
+  @media (max-width: 767px) {
+    .sticky-cta {
+      display: flex; gap: 12px;
+      position: fixed; left: 0; right: 0; bottom: 0;
+      z-index: 50;
+      padding: 20px 20px max(12px, env(safe-area-inset-bottom));
+      background: linear-gradient(to top, rgba(10,6,18,0.98) 60%, rgba(10,6,18,0) 100%);
+    }
+    .sticky-cta > button {
+      min-height: 48px; padding-left: 16px; padding-right: 16px; font-size: 13px;
+    }
+    .sticky-cta-primary { flex: 2; }
+    .sticky-cta-secondary { flex: 1; }
+
+    /* breathing room so page bottom not covered by sticky */
+    body { padding-bottom: 80px; }
+    /* offset anchor scroll for fixed nav */
+    #planos { scroll-margin-top: 80px; }
+  }
 `;
 
 // ── Stars ─────────────────────────────────────────────────────────
@@ -875,6 +897,28 @@ function Footer() {
   );
 }
 
+// ── Sticky CTA (mobile only) ──────────────────────────────────────
+function StickyMobileCTA() {
+  return (
+    <div className="sticky-cta">
+      <button
+        type="button"
+        className="btn-primary sticky-cta-primary"
+        onClick={() => { track('oraculo_sticky_cta_clicked'); window.location.href = "/app"; }}
+      >
+        Começar Agora
+      </button>
+      <button
+        type="button"
+        className="btn-outline sticky-cta-secondary"
+        onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
+      >
+        Planos
+      </button>
+    </div>
+  );
+}
+
 // ── App ───────────────────────────────────────────────────────────
 export default function App() {
   var [activeSection, setActiveSection] = useState("Início");
@@ -894,6 +938,7 @@ export default function App() {
         <LegalDisclaimer />
       </main>
       <Footer />
+      <StickyMobileCTA />
     </>
   );
 }
