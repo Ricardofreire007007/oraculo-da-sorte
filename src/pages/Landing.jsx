@@ -275,7 +275,7 @@ const styles = `
     position: absolute; bottom: -20px; left: 50%;
     transform: translateX(-50%) translateY(4px);
     font-family: 'Cinzel', serif; font-size: 10px;
-    white-space: nowrap; letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; letter-spacing: 0.2em; text-transform: uppercase;
     opacity: 0; transition: all 0.3s ease; pointer-events: none;
   }
 
@@ -395,7 +395,7 @@ const styles = `
     background: linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold});
     color: #1a0f00;
     font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
+    letter-spacing: 0.2em; text-transform: uppercase;
     padding: 6px 16px; border-radius: 20px; white-space: nowrap;
     box-shadow: 0 4px 12px rgba(232,201,122,0.3);
     z-index: 2;
@@ -417,6 +417,22 @@ const styles = `
       scroll-snap-align: center;
     }
     .plan-highlight { transform: none; } /* no scale em mobile (interfere com snap) */
+  }
+
+  /* Hero stats: base desktop + mobile horizontal bar with separators */
+  .hero-stats { display: flex; gap: 32px; margin-top: 40px; }
+  @media (max-width: 767px) {
+    .hero-stats {
+      justify-content: space-between; flex-wrap: nowrap; gap: 0;
+      margin-top: 32px; padding: 16px 0;
+      border-top: 1px solid rgba(201,168,76,0.15);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .hero-stats > div { flex: 1; position: relative; }
+    .hero-stats > div + div::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+      width: 1px; background: rgba(201,168,76,0.2);
+    }
   }
 
   /* Sticky mobile CTA (visible < 768px only) */
@@ -508,7 +524,7 @@ function Navbar({ activeSection, setActiveSection, user, login, logout }) {
   return (
     <>
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: scrolled ? "rgba(10,6,18,0.95)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(201,168,76,0.1)" : "none", transition: "all 0.3s ease", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div className="cinzel-deco gradient-text" style={{ fontSize: 18 }}>✦ Oráculo da Sorte</div>
+        <div className="cinzel-deco gradient-text" style={{ fontSize: "clamp(15px, 4.5vw, 18px)" }}>✦ Oráculo da Sorte</div>
 
         {/* Desktop nav */}
         <div className="nav-desktop">
@@ -589,9 +605,9 @@ function Hero() {
             <button className="btn-primary animate-pulse-gold" onClick={() => window.location.href = "/app"}>✦ Começar Agora</button>
             <button className="btn-outline" onClick={() => document.getElementById('caminhos')?.scrollIntoView({ behavior: 'smooth' })}>Ver Caminhos Místicos</button>
           </div>
-          <div className="hero-stats" style={{ display: "flex", gap: 32, marginTop: 40 }}>
+          <div className="hero-stats">
             {[["5 Rituais", "caminhos místicos"], ["7 Loterias", "suportadas"], ["R$9,99", "plano semanal"]].map(([num, label]) => (
-              <div key={label}><div className="cinzel gradient-text" style={{ fontSize: 22, fontWeight: 700 }}>{num}</div><div style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 2 }}>{label}</div></div>
+              <div key={label}><div className="cinzel gradient-text" style={{ fontSize: "clamp(18px, 5vw, 22px)", fontWeight: 700 }}>{num}</div><div style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 2 }}>{label}</div></div>
             ))}
           </div>
         </div>
@@ -789,7 +805,7 @@ function Pricing() {
           {plans.map((plan) => (
             <div key={plan.key} className={`card-mystical plan-card${plan.highlight ? " plan-highlight" : ""}`} style={{ padding: 36 }}>
               {plan.topBadge && <div className="plan-top-badge">{plan.topBadge}</div>}
-              {plan.badge && <div style={{ background: `linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold})`, color: "#1a0f00", fontSize: 11, fontFamily: "'Cinzel', serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 14px", borderRadius: 20, display: "inline-block", marginBottom: 16 }}>{plan.badge}</div>}
+              {plan.badge && <div style={{ background: `linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold})`, color: "#1a0f00", fontSize: 11, fontFamily: "'Cinzel', serif", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", padding: "4px 14px", borderRadius: 20, display: "inline-block", marginBottom: 16 }}>{plan.badge}</div>}
               <div style={{ fontSize: 40, marginBottom: 12 }}>{plan.icon}</div>
               <h3 className="cinzel" style={{ fontSize: 20, color: plan.color, marginBottom: 8 }}>{plan.name}</h3>
               <div style={{ marginBottom: 24 }}><span className="cinzel" style={{ fontSize: 42, fontWeight: 700, color: COLORS.text }}>{plan.price}</span><span style={{ fontSize: 14, color: COLORS.textMuted, marginLeft: 8 }}>{plan.period}</span></div>
@@ -870,7 +886,7 @@ function LegalDisclaimer() {
     <section style={{ padding: "40px 32px 0", position: "relative", zIndex: 1 }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "28px 32px" }}>
-          <p className="cinzel" style={{ fontSize: 11, color: COLORS.textMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>⚖️ Aviso Legal</p>
+          <p className="cinzel" style={{ fontSize: 11, color: COLORS.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 12 }}>⚖️ Aviso Legal</p>
           <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.8 }}>O Oráculo da Sorte é <strong style={{ color: COLORS.text }}>entretenimento espiritual</strong>. Não garantimos resultados. <strong style={{ color: COLORS.text }}>Jogue com responsabilidade.</strong> Conformidade com a <strong style={{ color: COLORS.text }}>LGPD</strong>. Não afiliado à Caixa Econômica Federal.</p>
         </div>
       </div>
