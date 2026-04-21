@@ -32,6 +32,20 @@ Utilizador com `data_nascimento=NULL` consegue entrar na `/app` sem ser redireci
 
 Reportado pela amiga em iPhone 12 Safari. Digitou "Sao paulo" em SUA LOCALIZAÇÃO e a lista de autocomplete (cidade / lat / lng / timezone) não apareceu, mostrando "Não foi possível detectar automaticamente. Digite sua cidade". API usada: `api.bigdatacloud.net/data/reverse-geocode-client` (pública, sem API key), em `src/OnboardingPopup.jsx:39`. Hipóteses: quota esgotada, CORS, timeout 10s muito curto em mobile 4G, ou a API está a devolver resultado vazio e o componente não trata. Não investigado a fundo.
 
+### Bug latente — profile.location nunca é lido após onboarding
+
+**Descoberto a 21/04/2026 durante investigação do Bug 1a.**
+
+Em `AuthContext.jsx`, `completeOnboarding` grava um profile optimistic com `location: formData.location` (objeto composto). Mas a BD só armazena `latitude`, `longitude`, `timezone` soltas — nunca um objeto `location`.
+
+Em `App.jsx:701`, quando é chamado `generateMysticNumbers` com `options.location`, esse valor vem de `profile.location` — que é `undefined` após qualquer reload porque `getProfile()` devolve colunas individuais, não um objeto composto.
+
+Resultado: `generatePlanetaria` em `oracle.js:507` cai sempre no seed default (42) para qualquer user excepto imediatamente após o primeiro onboarding.
+
+Inconsistência com o princípio de "determinismo absoluto" do CLAUDE.md §9 para a feature planetária.
+
+**Fix possível (não prioritário):** em `App.jsx` (ou em `AuthContext`), reconstruir `profile.location = { latitude, longitude, timezone }` a partir das colunas soltas quando carrega o perfil, OU adaptar `generatePlanetaria` para aceitar lat/lng/timezone soltos como parâmetros.
+
 ### Bugs do dia que FORAM fixados
 
 - **Bug 1b — Scroll do botão Continuar no onboarding** → fix em `src/OnboardingPopup.jsx` (commit `f63c227`), validação em iPhone real pendente
