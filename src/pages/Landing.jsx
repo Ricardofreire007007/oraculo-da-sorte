@@ -1,7 +1,6 @@
 ﻿import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
-import OnboardingPopup from "../OnboardingPopup.jsx";
 import { track } from "@vercel/analytics";
 
 const COLORS = {
@@ -674,11 +673,10 @@ function Footer() {
 // ── App ───────────────────────────────────────────────────────────
 export default function App() {
   var [activeSection, setActiveSection] = useState("Início");
-  var { user, showOnboarding, login, logout, completeOnboarding } = useAuth();
+  var { user, login, logout } = useAuth();
   return (
     <>
       <style>{styles}</style>
-      {showOnboarding && user && <OnboardingPopup userId={user.id} onComplete={completeOnboarding} />}
       <Stars />
       <Navbar activeSection={activeSection} setActiveSection={setActiveSection} user={user} login={login} logout={logout} />
       <main style={{ position: "relative", zIndex: 1 }}>

@@ -4,6 +4,7 @@ import { track } from '@vercel/analytics';
 import { supabase, getUser, getProfile, signInWithGoogle, signOut } from './auth.js';
 import { detectInAppBrowser } from './lib/inAppBrowser.js';
 import InAppBrowserWarning from './components/InAppBrowserWarning.jsx';
+import OnboardingPopup from './OnboardingPopup.jsx';
 
 const AuthContext = createContext({});
 
@@ -32,6 +33,9 @@ export function AuthProvider({ children }) {
         const userProfile = await getProfile(currentUser.id);
         if (userProfile) {
           setProfile(userProfile);
+          if (!userProfile.birth_date || !userProfile.full_name) {
+            setShowOnboarding(true);
+          }
         } else {
           setShowOnboarding(true);
         }
@@ -48,7 +52,11 @@ export function AuthProvider({ children }) {
           const userProfile = await getProfile(session.user.id);
           if (userProfile) {
             setProfile(userProfile);
-            setShowOnboarding(false);
+            if (!userProfile.birth_date || !userProfile.full_name) {
+              setShowOnboarding(true);
+            } else {
+              setShowOnboarding(false);
+            }
           } else {
             setShowOnboarding(true);
           }
@@ -103,6 +111,9 @@ export function AuthProvider({ children }) {
       refreshProfile,
     }}>
       {children}
+      {showOnboarding && user && (
+        <OnboardingPopup userId={user.id} onComplete={completeOnboarding} />
+      )}
       <InAppBrowserWarning
         open={showInAppWarning}
         onClose={() => setShowInAppWarning(false)}

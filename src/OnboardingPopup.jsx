@@ -68,7 +68,7 @@ export default function OnboardingPopup({ userId, onComplete }) {
   }, []);
 
   var handleSubmit = async function() {
-    if (!fullName.trim() || !birthDate) return;
+    if (!fullName.trim() || !birthDate || !birthCity?.trim()) return;
 
     setSaving(true);
     try {

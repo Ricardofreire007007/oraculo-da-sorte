@@ -757,6 +757,16 @@ export default function App() {
     );
   }
 
+  // ── Gate de perfil completo: onboarding abre por cima via AuthContext ──
+  if (!profile || !profile.birth_date || !profile.full_name) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: COLORS.bg, color: COLORS.gold, fontFamily: "'Cinzel', serif", fontSize: 18,
+      }}>✦ Consultando os astros...</div>
+    );
+  }
+
   // ── App ──
   return (
     <div style={{ minHeight: '100vh', background: COLORS.bg, color: COLORS.text, fontFamily: "'EB Garamond', serif" }}>
