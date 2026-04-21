@@ -118,13 +118,14 @@ export default function OnboardingPopup({ userId, onComplete }) {
       position: 'fixed', inset: 0, zIndex: 2000,
       background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(12px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 20,
+      padding: 20, overflowY: 'auto', overscrollBehavior: 'contain',
     }}>
       <div style={{
         background: 'linear-gradient(135deg, #0e0a1a, #150f28)',
         border: '1px solid rgba(201,168,76,0.3)',
         borderRadius: 20, padding: '40px 32px',
         maxWidth: 440, width: '100%',
+        margin: 'auto 0',
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
