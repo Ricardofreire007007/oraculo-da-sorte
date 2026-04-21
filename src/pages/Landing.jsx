@@ -275,13 +275,186 @@ const styles = `
     position: absolute; bottom: -20px; left: 50%;
     transform: translateX(-50%) translateY(4px);
     font-family: 'Cinzel', serif; font-size: 10px;
-    white-space: nowrap; letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; letter-spacing: 0.2em; text-transform: uppercase;
     opacity: 0; transition: all 0.3s ease; pointer-events: none;
   }
 
   @media (max-width: 700px) {
     .orbit-system { transform: scale(0.65) !important; }
     .orbit-sat { width: 80px; height: 80px; margin-left: -40px; margin-top: -40px; }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     MOBILE REFACTOR — mobile-first overrides
+     ═══════════════════════════════════════════════════ */
+
+  /* Navbar: desktop links wrapper + hamburger */
+  .nav-desktop { display: flex; gap: 32px; align-items: center; }
+  .nav-hamburger {
+    display: none;
+    width: 44px; height: 44px;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    padding: 0; cursor: pointer;
+    flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+    transition: border-color 0.2s;
+  }
+  .nav-hamburger:hover { border-color: ${COLORS.gold}; }
+  .nav-hamburger span {
+    display: block; width: 20px; height: 2px;
+    background: ${COLORS.gold}; border-radius: 1px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Drawer overlay + panel */
+  @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  .nav-drawer-overlay {
+    position: fixed; inset: 0; z-index: 99;
+    background: rgba(10,6,18,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: fadeInOverlay 0.25s ease;
+    display: flex; justify-content: flex-end;
+  }
+  .nav-drawer {
+    width: 100%; max-width: 320px; height: 100%;
+    background: linear-gradient(135deg, #0f0a1e 0%, #160f28 100%);
+    border-left: 1px solid rgba(201,168,76,0.2);
+    padding: 88px 28px 32px;
+    display: flex; flex-direction: column;
+    animation: slideInRight 0.3s ease;
+    box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+  }
+  .nav-drawer-links { display: flex; flex-direction: column; gap: 0; flex: 1; }
+  .nav-drawer-link {
+    background: transparent; border: none;
+    text-align: left; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 15px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    transition: color 0.2s, padding-left 0.2s;
+  }
+  .nav-drawer-link:hover,
+  .nav-drawer-link:focus-visible { color: ${COLORS.gold}; padding-left: 6px; outline: none; }
+  .nav-drawer-cta { padding-top: 24px; border-top: 1px solid rgba(201,168,76,0.15); margin-top: 16px; }
+
+  /* Mobile-only breakpoint: swap desktop nav for hamburger */
+  @media (max-width: 767px) {
+    .nav-desktop { display: none !important; }
+    .nav-hamburger { display: flex !important; }
+  }
+
+  /* Hero: 2-col grid collapses to 1-col centered in mobile */
+  .hero-grid {
+    max-width: 1100px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  @media (max-width: 767px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+    .hero-grid p { margin-left: auto; margin-right: auto; }
+    .hero-ctas, .hero-stats { justify-content: center; flex-wrap: wrap; }
+  }
+
+  /* Hero compact mobile: section padding, crystal size, tagline width, DOM reorder via CSS */
+  .hero-section { padding: 120px 32px 80px; }
+  .hero-crystal { position: relative; width: 220px; height: 220px; }
+  .hero-tagline { max-width: 480px; }
+  .hero-orb { font-size: 80px; }
+
+  @media (max-width: 767px) {
+    .hero-section { padding: 80px 20px 48px; }
+    .hero-crystal-wrap { order: -1; }
+    .hero-crystal { width: 110px; height: 110px; }
+    .hero-orb { font-size: 48px; }
+    .hero-tagline { max-width: 280px; }
+  }
+
+  /* Plans: desktop grid, mobile horizontal carousel with scroll-snap */
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px; align-items: start;
+  }
+  .plan-card { position: relative; }
+  .plan-highlight {
+    border: 2px solid ${COLORS.goldLight};
+    box-shadow: 0 0 40px rgba(232,201,122,0.18);
+    transform: scale(1.03);
+    overflow: visible; /* override .card-mystical overflow:hidden so top badge shows */
+  }
+  .plan-top-badge {
+    position: absolute; top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold});
+    color: #1a0f00;
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 20px; white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(232,201,122,0.3);
+    z-index: 2;
+  }
+
+  @media (max-width: 767px) {
+    .plans-grid {
+      display: flex; gap: 16px;
+      overflow-x: auto; overflow-y: visible;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-padding-inline: 20px;
+      padding: 16px 4px 24px;
+      scrollbar-width: none;
+    }
+    .plans-grid::-webkit-scrollbar { display: none; }
+    .plans-grid > .plan-card {
+      flex: 0 0 80%; min-width: 260px; max-width: 340px;
+      scroll-snap-align: center;
+    }
+    .plan-highlight { transform: none; } /* no scale em mobile (interfere com snap) */
+  }
+
+  /* Hero stats: base desktop + mobile horizontal bar with separators */
+  .hero-stats { display: flex; gap: 32px; margin-top: 40px; }
+  @media (max-width: 767px) {
+    .hero-stats {
+      justify-content: space-between; flex-wrap: nowrap; gap: 0;
+      margin-top: 32px; padding: 16px 0;
+      border-top: 1px solid rgba(201,168,76,0.15);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .hero-stats > div { flex: 1; position: relative; }
+    .hero-stats > div + div::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+      width: 1px; background: rgba(201,168,76,0.2);
+    }
+  }
+
+  /* Sticky mobile CTA (visible < 768px only) */
+  .sticky-cta { display: none; }
+  @media (max-width: 767px) {
+    .sticky-cta {
+      display: flex; gap: 12px;
+      position: fixed; left: 0; right: 0; bottom: 0;
+      z-index: 50;
+      padding: 20px 20px max(12px, env(safe-area-inset-bottom));
+      background: linear-gradient(to top, rgba(10,6,18,0.98) 60%, rgba(10,6,18,0) 100%);
+    }
+    .sticky-cta > button {
+      min-height: 48px; padding-left: 16px; padding-right: 16px; font-size: 13px;
+    }
+    .sticky-cta-primary { flex: 2; }
+    .sticky-cta-secondary { flex: 1; }
+
+    /* breathing room so page bottom not covered by sticky */
+    body { padding-bottom: 80px; }
+    /* offset anchor scroll for fixed nav */
+    #planos { scroll-margin-top: 80px; }
   }
 `;
 
@@ -308,57 +481,141 @@ function Stars() {
 }
 
 // ── Navbar ─────────────────────────────────────────────────────────
+const NAV_ITEMS = ["Início", "caminhos", "como-funciona", "planos", "faq"];
+const navLabel = (item) =>
+  item === "caminhos" ? "Caminhos" :
+  item === "como-funciona" ? "Como Funciona" :
+  item === "faq" ? "FAQ" :
+  item === "planos" ? "Planos" :
+  item;
+
 function Navbar({ activeSection, setActiveSection, user, login, logout }) {
   const [scrolled, setScrolled] = useState(false);
-  useEffect(() => { const h = () => setScrolled(window.scrollY > 40); window.addEventListener("scroll", h); return () => window.removeEventListener("scroll", h); }, []);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+
+  // Drawer: lock body scroll + close on ESC
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") setDrawerOpen(false); };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [drawerOpen]);
+
+  const goTo = (item) => {
+    setActiveSection(item);
+    setDrawerOpen(false);
+    document.getElementById(item)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleLogin = () => { track('oraculo_login_clicked'); setDrawerOpen(false); login(); };
+  const handleLogout = () => { setDrawerOpen(false); logout(); };
+
   return (
-    <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: scrolled ? "rgba(10,6,18,0.95)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(201,168,76,0.1)" : "none", transition: "all 0.3s ease", padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <div className="cinzel-deco gradient-text" style={{ fontSize: 18 }}>✦ Oráculo da Sorte</div>
-      <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-        {["Início", "caminhos", "como-funciona", "planos", "faq"].map((item) => (
-          <span key={item} className="nav-link" onClick={() => { setActiveSection(item); document.getElementById(item)?.scrollIntoView({ behavior: 'smooth' }); }}
-            style={{ color: activeSection === item ? COLORS.gold : undefined }}>
-            {item === 'caminhos' ? 'Caminhos' : item === 'como-funciona' ? 'Como Funciona' : item}
-          </span>
-        ))}
-        {user ? (
-          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={logout}>Sair</button>
-        ) : (
-          <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={() => { track('oraculo_login_clicked'); login(); }}>Entrar com Google</button>
-        )}
-      </div>
-    </nav>
+    <>
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: scrolled ? "rgba(10,6,18,0.95)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(201,168,76,0.1)" : "none", transition: "all 0.3s ease", padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="cinzel-deco gradient-text" style={{ fontSize: "clamp(15px, 4.5vw, 18px)" }}>✦ Oráculo da Sorte</div>
+
+        {/* Desktop nav */}
+        <div className="nav-desktop">
+          {NAV_ITEMS.map((item) => (
+            <span key={item} className="nav-link" onClick={() => goTo(item)}
+              style={{ color: activeSection === item ? COLORS.gold : undefined }}>
+              {navLabel(item)}
+            </span>
+          ))}
+          {user ? (
+            <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={handleLogout}>Sair</button>
+          ) : (
+            <button className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }} onClick={handleLogin}>Entrar com Google</button>
+          )}
+        </div>
+
+        {/* Mobile hamburger */}
+        <button
+          type="button"
+          className={`nav-hamburger ${drawerOpen ? "open" : ""}`}
+          aria-label={drawerOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={drawerOpen}
+          aria-controls="nav-drawer-panel"
+          onClick={() => setDrawerOpen((v) => !v)}
+        >
+          <span /><span /><span />
+        </button>
+      </nav>
+
+      {/* Mobile drawer */}
+      {drawerOpen && (
+        <div className="nav-drawer-overlay" onClick={() => setDrawerOpen(false)}>
+          <div
+            id="nav-drawer-panel"
+            className="nav-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu principal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="nav-drawer-links">
+              {NAV_ITEMS.map((item) => (
+                <button key={item} type="button" className="nav-drawer-link"
+                  onClick={() => goTo(item)}
+                  style={{ color: activeSection === item ? COLORS.gold : COLORS.text }}>
+                  {navLabel(item)}
+                </button>
+              ))}
+            </div>
+            <div className="nav-drawer-cta">
+              {user ? (
+                <button className="btn-primary" style={{ width: "100%" }} onClick={handleLogout}>Sair</button>
+              ) : (
+                <button className="btn-primary" style={{ width: "100%" }} onClick={handleLogin}>Entrar com Google</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
 // ── Hero ───────────────────────────────────────────────────────────
 function Hero() {
   return (
-    <section id="Início" style={{ minHeight: "100vh", display: "flex", alignItems: "center", padding: "120px 32px 80px", position: "relative", zIndex: 1 }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
+    <section id="Início" className="hero-section" style={{ minHeight: "100vh", display: "flex", alignItems: "center", position: "relative", zIndex: 1 }}>
+      <div className="hero-grid">
         <div className="animate-fadeInUp">
-          <h1 className="cinzel-deco" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.2, marginBottom: 20 }}>
+          <h1 className="cinzel-deco" style={{ fontSize: "clamp(1.75rem, 6.5vw, 3.5rem)", lineHeight: 1.2, marginBottom: 20 }}>
             <span className="gradient-text">Escolha seus números</span><br /><span style={{ color: COLORS.text }}>com intenção</span>
           </h1>
-          <p style={{ fontSize: 19, lineHeight: 1.8, color: COLORS.textMuted, marginBottom: 16, maxWidth: 480 }}>
+          <p className="hero-tagline" style={{ fontSize: 19, lineHeight: 1.8, color: COLORS.textMuted, marginBottom: 16 }}>
             O único app brasileiro que une <em style={{ color: COLORS.text }}>numerologia ancestral</em>, espiritualidade e análise de dados reais da Caixa Econômica — tudo em um ritual personalizado para cada jogo.
           </p>
           <p style={{ fontSize: 15, color: COLORS.textMuted, marginBottom: 36, fontStyle: "italic" }}>Entretenimento espiritual. Jogue com intenção, não com sorte cega.</p>
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div className="hero-ctas" style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             <button className="btn-primary animate-pulse-gold" onClick={() => window.location.href = "/app"}>✦ Começar Agora</button>
             <button className="btn-outline" onClick={() => document.getElementById('caminhos')?.scrollIntoView({ behavior: 'smooth' })}>Ver Caminhos Místicos</button>
           </div>
-          <div style={{ display: "flex", gap: 32, marginTop: 40 }}>
+          <div className="hero-stats">
             {[["5 Rituais", "caminhos místicos"], ["7 Loterias", "suportadas"], ["R$9,99", "plano semanal"]].map(([num, label]) => (
-              <div key={label}><div className="cinzel gradient-text" style={{ fontSize: 22, fontWeight: 700 }}>{num}</div><div style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 2 }}>{label}</div></div>
+              <div key={label}><div className="cinzel gradient-text" style={{ fontSize: "clamp(18px, 5vw, 22px)", fontWeight: 700 }}>{num}</div><div style={{ fontSize: 13, color: COLORS.textMuted, marginTop: 2 }}>{label}</div></div>
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <div className="animate-float" style={{ position: "relative", width: 220, height: 220 }}>
+        <div className="hero-crystal-wrap" style={{ display: "flex", justifyContent: "center" }}>
+          <div className="animate-float hero-crystal">
             <div style={{ position: "absolute", inset: -30, borderRadius: "50%", border: "1px solid rgba(201,168,76,0.15)", animation: "spin-slow 20s linear infinite" }} />
             <div style={{ position: "absolute", inset: -55, borderRadius: "50%", border: "1px dashed rgba(201,168,76,0.08)", animation: "spin-reverse 30s linear infinite" }} />
-            <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "radial-gradient(circle at 35% 35%, #3d2060, #1a0f35, #0d0820)", border: "2px solid rgba(201,168,76,0.4)", boxShadow: "0 0 60px rgba(61,30,100,0.6), 0 0 120px rgba(61,30,100,0.3), inset 0 0 40px rgba(201,168,76,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80 }}>🔮</div>
+            <div className="hero-orb" style={{ width: "100%", height: "100%", borderRadius: "50%", background: "radial-gradient(circle at 35% 35%, #3d2060, #1a0f35, #0d0820)", border: "2px solid rgba(201,168,76,0.4)", boxShadow: "0 0 60px rgba(61,30,100,0.6), 0 0 120px rgba(61,30,100,0.3), inset 0 0 40px rgba(201,168,76,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>🔮</div>
           </div>
         </div>
       </div>
@@ -534,9 +791,9 @@ async function handleCheckout(planoKey) {
 function Pricing() {
   var plans = [
     { key: "consulta",      name: "Pacote 3 Consultas", icon: "🎯", price: "R$ 6,00",  period: "pacote avulso", color: COLORS.textMuted, features: ["✓ 3 consultas completas", "✓ Todas as loterias brasileiras", "✓ R$ 2,00 por consulta"], cta: "Comprar", highlight: false },
-    { key: "mistico",       name: "Místico",            icon: "🔮", price: "R$ 9,90",  period: "7 dias",        color: COLORS.gold,      features: ["✓ R$ 1,41 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: false },
+    { key: "mistico",       name: "Místico",            icon: "🔮", price: "R$ 9,90",  period: "7 dias",        color: COLORS.gold,      topBadge: "Mais escolhido", features: ["✓ R$ 1,41 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: true },
     { key: "sagrado",       name: "Sagrado",            icon: "👑", price: "R$ 24,90", period: "30 dias",       color: COLORS.amber,     features: ["✓ R$ 0,83 por dia", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Todos os caminhos místicos"], cta: "Comprar", highlight: false },
-    { key: "premium_anual", name: "Premium Anual",      icon: "✦", price: "R$ 99,00", period: "365 dias",      color: COLORS.goldLight, badge: "Melhor Valor", features: ["✓ R$ 0,27 por dia", "✓ Um ano de acesso completo", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Melhor custo-benefício"], cta: "Comprar", highlight: true },
+    { key: "premium_anual", name: "Premium Anual",      icon: "✦", price: "R$ 99,00", period: "365 dias",      color: COLORS.goldLight, badge: "Melhor Valor", features: ["✓ R$ 0,27 por dia", "✓ Um ano de acesso completo", "✓ Consultas ilimitadas", "✓ Todas as loterias", "✓ Melhor custo-benefício"], cta: "Comprar", highlight: false },
   ];
   return (
     <section id="planos" style={{ padding: "100px 32px", position: "relative", zIndex: 1 }}>
@@ -544,10 +801,11 @@ function Pricing() {
         <p className="cinzel" style={{ textAlign: "center", color: COLORS.gold, fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 12 }}>PLANOS</p>
         <h2 className="section-title" style={{ color: COLORS.text, marginBottom: 12 }}>Escolha seu <span className="gradient-text">caminho espiritual</span></h2>
         <p style={{ textAlign: "center", color: COLORS.textMuted, fontSize: 17, marginBottom: 56, fontStyle: "italic" }}>Comece grátis. Evolua quando sentir a chamada.</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, alignItems: "start" }}>
+        <div className="plans-grid">
           {plans.map((plan) => (
-            <div key={plan.key} className="card-mystical" style={{ padding: 36, ...(plan.highlight ? { border: `2px solid ${COLORS.goldLight}`, boxShadow: "0 0 40px rgba(232,201,122,0.18)", transform: "scale(1.03)" } : {}) }}>
-              {plan.badge && <div style={{ background: `linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold})`, color: "#1a0f00", fontSize: 11, fontFamily: "'Cinzel', serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 14px", borderRadius: 20, display: "inline-block", marginBottom: 16 }}>{plan.badge}</div>}
+            <div key={plan.key} className={`card-mystical plan-card${plan.highlight ? " plan-highlight" : ""}`} style={{ padding: 36 }}>
+              {plan.topBadge && <div className="plan-top-badge">{plan.topBadge}</div>}
+              {plan.badge && <div style={{ background: `linear-gradient(135deg, ${COLORS.amber}, ${COLORS.gold})`, color: "#1a0f00", fontSize: 11, fontFamily: "'Cinzel', serif", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", padding: "4px 14px", borderRadius: 20, display: "inline-block", marginBottom: 16 }}>{plan.badge}</div>}
               <div style={{ fontSize: 40, marginBottom: 12 }}>{plan.icon}</div>
               <h3 className="cinzel" style={{ fontSize: 20, color: plan.color, marginBottom: 8 }}>{plan.name}</h3>
               <div style={{ marginBottom: 24 }}><span className="cinzel" style={{ fontSize: 42, fontWeight: 700, color: COLORS.text }}>{plan.price}</span><span style={{ fontSize: 14, color: COLORS.textMuted, marginLeft: 8 }}>{plan.period}</span></div>
@@ -628,7 +886,7 @@ function LegalDisclaimer() {
     <section style={{ padding: "40px 32px 0", position: "relative", zIndex: 1 }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "28px 32px" }}>
-          <p className="cinzel" style={{ fontSize: 11, color: COLORS.textMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>⚖️ Aviso Legal</p>
+          <p className="cinzel" style={{ fontSize: 11, color: COLORS.textMuted, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 12 }}>⚖️ Aviso Legal</p>
           <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.8 }}>O Oráculo da Sorte é <strong style={{ color: COLORS.text }}>entretenimento espiritual</strong>. Não garantimos resultados. <strong style={{ color: COLORS.text }}>Jogue com responsabilidade.</strong> Conformidade com a <strong style={{ color: COLORS.text }}>LGPD</strong>. Não afiliado à Caixa Econômica Federal.</p>
         </div>
       </div>
@@ -655,6 +913,28 @@ function Footer() {
   );
 }
 
+// ── Sticky CTA (mobile only) ──────────────────────────────────────
+function StickyMobileCTA() {
+  return (
+    <div className="sticky-cta">
+      <button
+        type="button"
+        className="btn-primary sticky-cta-primary"
+        onClick={() => { track('oraculo_sticky_cta_clicked'); window.location.href = "/app"; }}
+      >
+        Começar Agora
+      </button>
+      <button
+        type="button"
+        className="btn-outline sticky-cta-secondary"
+        onClick={() => document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' })}
+      >
+        Planos
+      </button>
+    </div>
+  );
+}
+
 // ── App ───────────────────────────────────────────────────────────
 export default function App() {
   var [activeSection, setActiveSection] = useState("Início");
@@ -674,6 +954,7 @@ export default function App() {
         <LegalDisclaimer />
       </main>
       <Footer />
+      <StickyMobileCTA />
     </>
   );
 }
